@@ -16,7 +16,7 @@ while True:
         if event.type == pygame.QUIT:
             exit()
 
-    screen.fill(THECOLORS['grey'])
+    screen.fill(THECOLORS["grey"])
 
     for obj in objs[1]:
         obj.draw(screen)
