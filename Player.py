@@ -1,7 +1,6 @@
 import pygame
-from pygame.color import THECOLORS
-
 from Cfg import *
+from pygame.color import THECOLORS
 
 
 def upd():
@@ -34,7 +33,7 @@ class player:
 
     def Collide(self, direction, speed):
 
-        if direction in ["U", "D", "L"]:
+        if direction in ["D", "U", "L"]:
             speed *= -1
         if direction in ["R", "L"]:
             self.rect = [
@@ -42,6 +41,8 @@ class player:
                 self.y - self.radius,
                 self.x + self.radius + speed,
                 self.y + self.radius,
+                self.x + speed,
+                self.y
             ]
         elif direction in ["U", "D"]:
             self.rect = [
@@ -49,23 +50,37 @@ class player:
                 self.y - self.radius + speed,
                 self.x + self.radius,
                 self.y + self.radius + speed,
+                self.x,
+                self.y + speed,
             ]
         dots = [
             (self.rect[0], self.rect[1]),
             (self.rect[0], self.rect[3]),
             (self.rect[2], self.rect[1]),
             (self.rect[2], self.rect[3]),
+            (self.rect[4], self.rect[1]),
+            (self.rect[4], self.rect[3]),
+            (self.rect[0], self.rect[5]),
+            (self.rect[2], self.rect[5]),
         ]
         for obj in objects[1]:
             for x, y in dots:
                 point = obj.rect
-                if (x >= point[0] and x <= point[2]) and (
-                    y >= point[1] and y <= point[3]
+                if (x > point[0] and x < point[2]) and (
+                    y > point[1] and y < point[3]
                 ):
                     if direction in ["U", "D"]:
                         self.boost = 0
-                    return False
-        return True
+                    if direction == 'R':
+                        return point[0] - (self.x + self.radius)
+                    elif direction == 'L':
+                        return point[2] - (self.x - self.radius)
+                    elif direction == 'U':
+                        return point[3] - (self.y - self.radius)
+                    elif direction == 'D':
+                        self.in_air = 0
+                        return point[1] - (self.y + self.radius)
+        return speed
 
     def draw(self, screen):
         pygame.draw.circle(
@@ -75,34 +90,39 @@ class player:
     def movement(self):
         key = pygame.key.get_pressed()
         if key[pygame.K_LEFT] or key[pygame.K_a]:
-            if self.Collide("L", player_speed):
-                self.x -= player_speed
+            self.speed = self.Collide("L", player_speed)
+            if self.speed:
+                self.x += self.speed
                 self.look = 0
         if key[pygame.K_RIGHT] or key[pygame.K_d]:
-            if self.Collide("R", player_speed):
-                self.x += player_speed
+            self.speed = self.Collide("R", player_speed)
+            if self.speed:
+                self.x += self.speed
                 self.look = 1
-        if key[pygame.K_UP] or key[pygame.K_d] and self.y > 10:
+        if key[pygame.K_UP] or key[pygame.K_w]:
             if not self.in_air:
                 self.boost = jump_impulse
                 self.in_air = 1
 
-        if self.boost >= 0:
-            if self.Collide("U", self.boost):
-                self.y -= self.boost
+        if self.boost > 0:
+            self.speed = self.Collide("U", self.boost)
+            if self.speed:
+                self.y += self.speed
                 self.boost -= gravity
             else:
                 self.boost -= gravity
-        elif self.boost < 0:
-            self.in_air = 1
+        elif self.boost <= 0:
             if self.boost <= -18:
                 self.boost = -18
-            if self.Collide("D", self.boost):
-                self.y -= self.boost
+            self.in_air = 1
+
+            self.speed = self.Collide("D", self.boost)
+            
+            if self.speed:
+                self.y += self.speed
                 self.boost -= gravity
             else:
-                self.boost = 0
-                self.in_air = 0
+                self.boost -= gravity
 
         if self.x > Width:
             self.x = self.x // Width
