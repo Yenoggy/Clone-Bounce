@@ -3,7 +3,7 @@ Height = 800
 
 player_radius = 10
 player_pos = (400, 500)
-player_speed = 3
+player_speed = 5
 player_look = 1
 
 
