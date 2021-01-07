@@ -31,6 +31,8 @@ while True:
         obj.draw(screen)
     for obj in objs[2]:
         objs[2][obj].draw(screen)
+    for obj in objs[3]:
+        obj.draw(screen)
     player.draw(screen)
     player.movement()
     for obj in objs[2]:

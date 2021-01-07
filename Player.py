@@ -61,11 +61,8 @@ class player:
         self.rect = []
         self.look = player_look
         self.in_air = 0
-        self.is_death = is_death
-        self.death_count = death_count
-        self.is_reborn = is_reborn
-        self.reborn_count = reborn_count
         self.boost = 0
+        self.life = 1
 
         
 
@@ -139,61 +136,76 @@ class player:
                     elif direction == 'D':
                         self.in_air = 0
                         return point[1] - (self.y + self.radius)
+
+        for obj in objects[3]:
+            for x, y in dots:
+                point = obj.rect
+                if (x > point[0] and x < point[2]) and (
+                    y > point[1] and y < point[3]
+                ):
+                    if direction in ["U", "D"]:
+                        self.boost = 0
+                    self.life = 0
+                    self.x, self.y = player_pos
         return speed
 
     def draw(self, screen):
-        pygame.draw.circle(
-            screen, THECOLORS["brown"], (int(self.x), int(self.y)), self.radius
-        )
+        if self.life:
+            pygame.draw.circle(
+                screen, THECOLORS["brown"], (int(self.x), int(self.y)), self.radius
+            )
+        else:
+            self.life = 1
 
     def movement(self):
-        key = pygame.key.get_pressed()
-        if key[pygame.K_F6]:
-            if not player.connected:
-                player.connected = 1
-                Thread(target=ConnectServer).start()
-            
+        if self.life:
+            key = pygame.key.get_pressed()
+            if key[pygame.K_F6]:
+                if not player.connected:
+                    player.connected = 1
+                    Thread(target=ConnectServer).start()
 
 
-        if key[pygame.K_LEFT] or key[pygame.K_a]:
-            self.speed = self.Collide("L", player_speed)
-            if self.speed:
-                self.x += self.speed
-                self.look = 0
-        if key[pygame.K_RIGHT] or key[pygame.K_d]:
-            self.speed = self.Collide("R", player_speed)
-            if self.speed:
-                self.x += self.speed
-                self.look = 1
-        if key[pygame.K_UP] or key[pygame.K_w]:
-            if not self.in_air:
-                self.boost = jump_impulse
+
+            if key[pygame.K_LEFT] or key[pygame.K_a]:
+                self.speed = self.Collide("L", player_speed)
+                if self.speed:
+                    self.x += self.speed
+                    self.look = 0
+            if key[pygame.K_RIGHT] or key[pygame.K_d]:
+                self.speed = self.Collide("R", player_speed)
+                if self.speed:
+                    self.x += self.speed
+                    self.look = 1
+            if key[pygame.K_UP] or key[pygame.K_w]:
+                if not self.in_air:
+                    self.boost = jump_impulse
+                    self.in_air = 1
+
+            if self.boost > 0:
+                self.speed = self.Collide("U", self.boost)
+                if self.speed:
+                    self.y += self.speed
+                    self.boost -= gravity
+                else:
+                    self.boost -= gravity
+            elif self.boost <= 0:
+                if self.boost <= -18:
+                    self.boost = -18
                 self.in_air = 1
 
-        if self.boost > 0:
-            self.speed = self.Collide("U", self.boost)
-            if self.speed:
-                self.y += self.speed
-                self.boost -= gravity
-            else:
-                self.boost -= gravity
-        elif self.boost <= 0:
-            if self.boost <= -18:
-                self.boost = -18
-            self.in_air = 1
+                self.speed = self.Collide("D", self.boost)
 
-            self.speed = self.Collide("D", self.boost)
-            
-            if self.speed:
-                self.y += self.speed
-                self.boost -= gravity
-            else:
-                self.boost -= gravity
+                if self.speed:
+                    self.y += self.speed
+                    self.boost -= gravity
+                else:
+                    self.boost -= gravity
 
-        if self.x > Width:
-            self.x = self.x // Width
-        elif self.x < 0:
-            self.x = Width
+            if self.x > Width:
+                self.x = self.x // Width
+            elif self.x < 0:
+                self.x = Width
 
 
 class Object:

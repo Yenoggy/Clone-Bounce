@@ -9,8 +9,3 @@ player_look = 1
 
 jump_impulse = 20
 gravity = 1
-
-is_death = False
-death_count = 5
-is_reborn = False
-reborn_count = -5

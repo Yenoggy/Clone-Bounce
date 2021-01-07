@@ -34,5 +34,8 @@ objects = [
         Object(THECOLORS["yellow"], 550, 140, 20, 60),
     ],
     {},
+    [
+        Object(THECOLORS["red"], 260, 550, 30, 50),
+    ],
 ]
 upd()
