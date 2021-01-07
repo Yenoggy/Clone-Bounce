@@ -33,6 +33,8 @@ while True:
         objs[2][obj].draw(screen)
     player.draw(screen)
     player.movement()
+    for obj in objs[2]:
+        objs[2][obj].movement()
 
     pygame.display.flip()
     clock.tick(60)

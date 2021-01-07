@@ -10,15 +10,15 @@ PlayerList = {}
 
 def Join():
     if len(PlayerList) == 0:
-        PlayerList['1'] = {'pos':StartPos}
+        PlayerList['1'] = {'pos':StartPos, 'boost':0}
     else:
-        PlayerList[str(int(list(PlayerList.keys())[-1])+1)] = {'pos':StartPos}
+        PlayerList[str(int(list(PlayerList.keys())[-1])+1)] = {'pos':StartPos, 'boost':0}
     return str(list(PlayerList.keys())[-1])
 
 @app.post('/GetInfo')
 def GetInfo(x, y, nickname):
     if nickname in PlayerList:
-        PlayerList[nickname] = {'pos':(int(x),int(y))}
+        PlayerList[nickname] = {'pos':(int(x),int(y)), 'boost':0}
         objects = PlayerList.copy()
         objects.pop(nickname)
         return objects
@@ -40,10 +40,6 @@ def Start():
         CFG = json.load(f)
         Map = CFG['map']
         StartPos = CFG['startpos']
-
-
-
-
 
 if __name__ == '__main__':
     Start()
