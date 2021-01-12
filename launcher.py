@@ -36,7 +36,7 @@ class Main:
         self.StartbtnSingle.place(x=89, y=140)
 
         # Кнопка запуска мультиплеера
-        self.Startbtn_mp = Button(self.Startfr, text='MULTIPLAYER', border=0, command=self.btnStart, cursor='hand2',
+        self.Startbtn_mp = Button(self.Startfr, text='MULTIPLAYER', border=0, command=self.btnStart_mp, cursor='hand2',
                                font=17)
         self.Startbtn_mp.config(bg='#202020', activebackground='#151515', activeforeground='grey', fg='grey')
         self.Startbtn_mp.bind("<Enter>", self.inStart_mp)
@@ -65,6 +65,11 @@ class Main:
         import main
         self.window.destroy()
 
+    # Запуск мультиплеера
+    def btnStart_mp(self):
+        import main
+        self.window.destroy()
+
     # Закрытие окна
     def close(self, event):
         self.window.destroy()
@@ -76,10 +81,10 @@ class Main:
 
     # Эффекты
     def inStart(self, event):
-        self.Startbtn.config(bg='#202020', activebackground='#151515', fg='white')
+        self.StartbtnSingle.config(bg='#202020', activebackground='#151515', fg='white')
 
     def outStart(self, event):
-        self.Startbtn.config(bg='#202020', activebackground='#151515',  fg='grey')
+        self.StartbtnSingle.config(bg='#202020', activebackground='#151515',  fg='grey')
 
     def inStart_mp(self, event):
         self.Startbtn_mp.config(bg='#202020', activebackground='#151515', fg='white')
