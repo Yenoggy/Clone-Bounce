@@ -1,11 +1,13 @@
 from fastapi import FastAPI, Request
-from pygame.color import THECOLORS
 import uvicorn, json, pygame
 
 app = FastAPI()
 
 objects = []
 Map = []
+spikes = []
+coins = []
+mud = []
 PlayerList = {}
 
 def Join():
@@ -27,7 +29,7 @@ def GetInfo(x, y, nickname):
 @app.post('/Connect')
 def Connect():
     resp = Join()
-    return {'map':Map, 'nickname':resp, 'pos':StartPos}
+    return {'map':Map, "spikes":spikes, "coins":coins, "mud":mud, 'nickname':resp, 'pos':StartPos}
 
 @app.get('/Disconnect')
 def Disconnect(nickname):
@@ -35,10 +37,14 @@ def Disconnect(nickname):
     return ''
 
 def Start():
-    global Map, StartPos
+    global Map, StartPos, spikes, coins, mud
     with open('Config.json', 'r') as f:
         CFG = json.load(f)
         Map = CFG['map']
+        spikes = CFG['spikes']
+        coins = CFG['coins']
+        mud = CFG['mud']
+
         StartPos = CFG['startpos']
 
 if __name__ == '__main__':

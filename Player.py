@@ -28,6 +28,10 @@ def ConnectServer():
         global objects
         resp = loads(resp.text)
         objects[1] = eval(resp['map'])
+        objects[3] = eval(resp['spikes'])
+        objects[4] = eval(resp['coins'])
+        objects[5] = eval(resp['mud'])
+
         objects[0].nickname = resp['nickname']
         objects[0].x, objects[0].y = resp['pos']
         Tickrate = pygame.time.Clock()
@@ -321,7 +325,7 @@ class ObjectPlayer:
                     elif direction == 'D':
                         self.in_air = 0
                         return point[1] - (self.y + self.radius)
-        for obj in [objects[0], ]:
+        for obj in [objects[0],]:
             for x, y in dots:
                 point = obj.rect
                 if (x > point[0] and x < point[2]) and (
@@ -338,8 +342,26 @@ class ObjectPlayer:
                     elif direction == 'D':
                         self.in_air = 0
                         return point[1] - (self.y + self.radius)
-        return speed
 
+        for obj in objects[2]:
+            for x, y in dots:
+                point = objects[2][obj].rect
+                if (x > point[0] and x < point[2]) and (
+                        y > point[1] and y < point[3]
+                ):
+                    if direction in ["U", "D"]:
+                        self.boost = 0
+                    if direction == 'R':
+                        return point[0] - (self.x + self.radius)
+                    elif direction == 'L':
+                        return point[2] - (self.x - self.radius)
+                    elif direction == 'U':
+                        return point[3] - (self.y - self.radius)
+                    elif direction == 'D':
+                        self.in_air = 0
+                        return point[1] - (self.y + self.radius)
+        return speed
+        
     def movement(self):
         if self.boost > 0:
             self.speed = self.Collide("U", self.boost)
@@ -365,8 +387,3 @@ class ObjectPlayer:
             self.x = self.x // Width
         elif self.x < 0:
             self.x = Width
-    # def Collide(self, obj):
-    #     for point in obj.rect:
-    #         if point > self.x and point < self.x + self.offsets[0] and point > self.y and point < self.y + self.offsets[1]:
-    #             return True
-    #     return False
