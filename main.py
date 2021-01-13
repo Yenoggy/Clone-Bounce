@@ -7,7 +7,8 @@ from Cfg import *
 pygame.init()
 screen = pygame.display.set_mode((800, 800))
 clock = pygame.time.Clock()
-
+pygame.display.set_caption('Clone Bounce')
+pygame.display.set_icon(pygame.image.load("icon.bmp"))
 
 player = objs[0]
 
@@ -40,4 +41,4 @@ while True:
 
     pygame.display.flip()
     clock.tick(40)
-    pygame.display.set_caption(str(round(clock.get_fps(), 2)))
+

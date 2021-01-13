@@ -5,13 +5,16 @@ from pygame.color import THECOLORS
 from MultiplayerAPI import ServerAPI
 from threading import Thread
 
+
 def upd():
     global objects
     from Objects import objects
 
+
 def ConnectServer():
     global Server, connected
-    os.system('mshta "javascript:var sh=new ActiveXObject( \'WScript.Shell\' ); sh.Popup( \'Введи IP:PORT в консоли!\', 10, \'Подключение к серверу\', 64 );close()"')
+    os.system(
+        'mshta "javascript:var sh=new ActiveXObject( \'WScript.Shell\' ); sh.Popup( \'Введи IP:PORT в консоли!\', 10, \'Подключение к серверу\', 64 );close()"')
     address = input('IP:PORT\n>>> ')
     print(f'Подключение к {address}')
     if address != '':
@@ -32,7 +35,7 @@ def ConnectServer():
         while connected:
             # Thread(target=Server.GetInfo, args=((objects[0].x,objects[0].y),objects[0].nickname,)).start()
             # Info = Server.Info.get()
-            Info = Server.GetInfo((objects[0].x,objects[0].y),objects[0].nickname)
+            Info = Server.GetInfo((objects[0].x, objects[0].y), objects[0].nickname)
             objects[2] = {}
             for i in Info:
                 if i in objects[2]:
@@ -44,9 +47,8 @@ def ConnectServer():
 
     else:
         player.connected = 0
-        os.system(f'mshta "javascript:var sh=new ActiveXObject( \'WScript.Shell\' ); sh.Popup( \'Соединение прервано! Код ошибки: {resp.status}\', 10, \'Ошибка при подключении\', 64 );close()"')
- 
-
+        os.system(
+            f'mshta "javascript:var sh=new ActiveXObject( \'WScript.Shell\' ); sh.Popup( \'Соединение прервано! Код ошибки: {resp.status}\', 10, \'Ошибка при подключении\', 64 );close()"')
 
 
 objects = []
@@ -54,6 +56,7 @@ objects = []
 
 class player:
     connected = 0
+
     def __init__(self):
         self.nickname = ''
         self.radius = player_radius
@@ -63,8 +66,6 @@ class player:
         self.in_air = 0
         self.boost = 0
         self.life = 1
-
-        
 
     @property
     def pos(self):
@@ -106,7 +107,7 @@ class player:
             for x, y in dots:
                 point = obj.rect
                 if (x > point[0] and x < point[2]) and (
-                    y > point[1] and y < point[3]
+                        y > point[1] and y < point[3]
                 ):
                     if direction in ["U", "D"]:
                         self.boost = 0
@@ -123,7 +124,7 @@ class player:
             for x, y in dots:
                 point = objects[2][obj].rect
                 if (x > point[0] and x < point[2]) and (
-                    y > point[1] and y < point[3]
+                        y > point[1] and y < point[3]
                 ):
                     if direction in ["U", "D"]:
                         self.boost = 0
@@ -141,7 +142,7 @@ class player:
             for x, y in dots:
                 point = obj.rect
                 if (x > point[0] and x < point[2]) and (
-                    y > point[1] and y < point[3]
+                        y > point[1] and y < point[3]
                 ):
                     if direction in ["U", "D"]:
                         self.boost = 0
@@ -164,8 +165,6 @@ class player:
                 if not player.connected:
                     player.connected = 1
                     Thread(target=ConnectServer).start()
-
-
 
             if key[pygame.K_LEFT] or key[pygame.K_a]:
                 self.speed = self.Collide("L", player_speed)
@@ -224,6 +223,14 @@ class Object:
     def pos(self):
         return self.x, self.y
 
+
+class Ring(pygame.sprite.Sprite):
+    def __init__(self, filename):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(filename)
+        self.rect = self.image.get_rect()
+
+
 class ObjectPlayer:
     def __init__(self, pos):
         self.x, self.y = pos
@@ -231,11 +238,12 @@ class ObjectPlayer:
         self.boost = 0
         self.in_air = 0
         self.rect = [
-                self.x - self.radius,
-                self.y - self.radius,
-                self.x + self.radius,
-                self.y + self.radius,
-            ]
+            self.x - self.radius,
+            self.y - self.radius,
+            self.x + self.radius,
+            self.y + self.radius,
+        ]
+
     def draw(self, screen):
         pygame.draw.circle(
             screen, THECOLORS["blue"], (int(self.x), int(self.y)), self.radius
@@ -277,7 +285,7 @@ class ObjectPlayer:
             for x, y in dots:
                 point = obj.rect
                 if (x > point[0] and x < point[2]) and (
-                    y > point[1] and y < point[3]
+                        y > point[1] and y < point[3]
                 ):
                     if direction in ["U", "D"]:
                         self.boost = 0
@@ -290,11 +298,11 @@ class ObjectPlayer:
                     elif direction == 'D':
                         self.in_air = 0
                         return point[1] - (self.y + self.radius)
-        for obj in [objects[0],]:
+        for obj in [objects[0], ]:
             for x, y in dots:
                 point = obj.rect
                 if (x > point[0] and x < point[2]) and (
-                    y > point[1] and y < point[3]
+                        y > point[1] and y < point[3]
                 ):
                     if direction in ["U", "D"]:
                         self.boost = 0
@@ -323,7 +331,7 @@ class ObjectPlayer:
             self.in_air = 1
 
             self.speed = self.Collide("D", self.boost)
-            
+
             if self.speed:
                 self.y += self.speed
                 self.boost -= gravity
