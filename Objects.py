@@ -49,16 +49,21 @@ objects = [
     ],
     [
         Object(THECOLORS["yellow"], 715, 552, 20, 20),
-        Object(THECOLORS["yellow"], 75, 252, 20, 20),
+        Object(THECOLORS["yellow"], 65, 252, 20, 20),
         Object(THECOLORS["yellow"], 700, 160, 20, 20),
         Object(THECOLORS["yellow"], 740, 160, 20, 20),
         Object(THECOLORS["yellow"], 400, 100, 20, 20),
-        Object(THECOLORS["yellow"], 250, 40, 20, 20),
+        Object(THECOLORS["yellow"], 260, 42, 20, 20),
         Object(THECOLORS["yellow"], 240, 730, 20, 20),
         Object(THECOLORS["yellow"], 280, 730, 20, 20),
     ],
     [
-        Object(THECOLORS["white"], 500, 600, 140, 20),
+        Object(THECOLORS["mediumseagreen"], 480, 580, 180, 20),
+        Object(THECOLORS["mediumseagreen"], 120, 380, 120, 20),
+        Object(THECOLORS["mediumseagreen"], 470, 180, 80, 20),
+        Object(THECOLORS["mediumseagreen"], 550, 340, 120, 10),
+        Object(THECOLORS["mediumseagreen"], 100, 70, 100, 10),
+
     ],
 ]
 upd()
