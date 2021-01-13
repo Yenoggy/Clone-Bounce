@@ -26,7 +26,7 @@ while True:
                 Server.Disconnect(player.nickname)
             exit()
 
-    screen.fill(THECOLORS["grey"])
+    screen.fill(THECOLORS['lightblue'])
 
     for obj in objs[1]:
         obj.draw(screen)
