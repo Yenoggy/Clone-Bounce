@@ -23,8 +23,8 @@ objects = [
         Object(THECOLORS["yellow"], 350, 725, 20, 50),
         Object(THECOLORS["yellow"], 500, 200, 450, 20),
         Object(THECOLORS["yellow"], 500, 350, 200, 20),
-        Object(THECOLORS["yellow"], 665, 350, 20, 60), 
-        Object(THECOLORS["yellow"], 665, 460, 20, 60), 
+        Object(THECOLORS["yellow"], 665, 350, 20, 60),
+        Object(THECOLORS["yellow"], 665, 460, 20, 60),
         Object(THECOLORS["yellow"], 500, 350, 20, 40),
         Object(THECOLORS["yellow"], 300, 0, 20, 200),
         Object(THECOLORS["yellow"], 90, 80, 220, 20),
@@ -42,9 +42,23 @@ objects = [
         Object(THECOLORS["red"], 740, 535, 40, 20), # wall
         Object(THECOLORS["red"], 20, 235, 40, 20),  # wall_l
         Object(THECOLORS["red"], 20, 270, 40, 20),  # wall_l
+        Object(THECOLORS["red"], 490, 730, 20, 40),
         Object(THECOLORS["red"], 540, 730, 20, 40),
         Object(THECOLORS["red"], 590, 730, 20, 40),
         Object(THECOLORS["red"], 640, 730, 20, 40),
+    ],
+    [
+        Object(THECOLORS["orange"], 715, 552, 20, 20),
+        Object(THECOLORS["orange"], 75, 252, 20, 20),
+        Object(THECOLORS["orange"], 700, 160, 20, 20),
+        Object(THECOLORS["orange"], 740, 160, 20, 20),
+        Object(THECOLORS["orange"], 400, 100, 20, 20),
+        Object(THECOLORS["orange"], 250, 40, 20, 20),
+        Object(THECOLORS["orange"], 240, 730, 20, 20),
+        Object(THECOLORS["orange"], 280, 730, 20, 20),
+    ],
+    [
+        Object(THECOLORS["black"], 500, 600, 140, 20),
     ],
 ]
 upd()

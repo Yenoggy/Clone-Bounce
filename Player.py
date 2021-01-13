@@ -66,6 +66,7 @@ class player:
         self.in_air = 0
         self.boost = 0
         self.life = 1
+        self.score = 0
 
     @property
     def pos(self):
@@ -148,7 +149,29 @@ class player:
                         self.boost = 0
                     self.life = 0
                     self.x, self.y = player_pos
-        return speed
+
+        for obj in objects[4]:
+            for x, y in dots:
+                point = obj.rect
+                if (x > point[0] and x < point[2]) and (
+                        y > point[1] and y < point[3]
+                ):
+                    self.score += 1
+                    objects[4].remove(obj)
+                    print(self.score)
+                    return speed
+
+
+        for obj in objects[5]:
+            for x, y in dots:
+                point = obj.rect
+                if (x > point[0] and x < point[2]) and (
+                        y > point[1] and y < point[3]
+                ):
+                    if direction in ["D"]:
+                        self.boost = 0
+
+            return speed
 
     def draw(self, screen):
         if self.life:
