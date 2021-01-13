@@ -1,0 +1,12 @@
+pygame
+MultiplayerAPI
+json
+threading
+fastapi
+uvicorn
+queue
+tkinter
+pywin32
+webbrowser
+requests
+pygame.color
