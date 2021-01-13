@@ -3,7 +3,7 @@ from Cfg import *
 # from main import Update as ObjUpdate
 
 pl = player()
-world = Object(THECOLORS["slateblue3"], 0, Height // 2 + 370, Width, Height)
+world = Object(THECOLORS["lightgoldenrod"], 0, Height // 2 + 370, Width, Height)
 
 objects = [
     pl,
@@ -20,7 +20,7 @@ objects = [
         Object(THECOLORS["slateblue3"], 0, 600, 110, 20),
         Object(THECOLORS["slateblue3"], 140, 400, 60, 20),
         Object(THECOLORS["slateblue3"], 350, 620, 20, 50),
-        Object(THECOLORS["slateblue3"], 350, 725, 20, 50),
+        Object(THECOLORS["slateblue3"], 350, 720, 20, 50),
         Object(THECOLORS["slateblue3"], 500, 200, 450, 20),
         Object(THECOLORS["slateblue3"], 500, 350, 200, 20),
         Object(THECOLORS["slateblue3"], 665, 350, 20, 60),
@@ -35,7 +35,9 @@ objects = [
     ],
     {},
     [
-        Object(THECOLORS["hotpink3"], 260, 560, 20, 40),
+        Object(THECOLORS["hotpink3"], 250, 560, 20, 40),
+        Object(THECOLORS["hotpink3"], 300, 560, 20, 40),
+        Object(THECOLORS["hotpink3"], 350, 560, 20, 40),
         Object(THECOLORS["hotpink3"], 600, 160, 20, 40),
         Object(THECOLORS["hotpink3"], 50, 560, 20, 40),
         Object(THECOLORS["hotpink3"], 740, 570, 40, 20), # wall

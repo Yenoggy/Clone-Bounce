@@ -171,7 +171,7 @@ class player:
                     if direction in ["D"]:
                         self.boost = 0
 
-            return speed
+        return speed
 
     def draw(self, screen):
         if self.life:
