@@ -35,7 +35,16 @@ objects = [
     ],
     {},
     [
-        Object(THECOLORS["red"], 260, 550, 30, 50),
+        Object(THECOLORS["red"], 260, 560, 20, 40),
+        Object(THECOLORS["red"], 600, 160, 20, 40),
+        Object(THECOLORS["red"], 50, 560, 20, 40),
+        Object(THECOLORS["red"], 740, 570, 40, 20), # wall
+        Object(THECOLORS["red"], 740, 535, 40, 20), # wall
+        Object(THECOLORS["red"], 20, 235, 40, 20),  # wall_l
+        Object(THECOLORS["red"], 20, 270, 40, 20),  # wall_l
+        Object(THECOLORS["red"], 540, 730, 20, 40),
+        Object(THECOLORS["red"], 590, 730, 20, 40),
+        Object(THECOLORS["red"], 640, 730, 20, 40),
     ],
 ]
 upd()

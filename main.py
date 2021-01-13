@@ -39,5 +39,5 @@ while True:
         objs[2][obj].movement()
 
     pygame.display.flip()
-    clock.tick(60)
+    clock.tick(40)
     pygame.display.set_caption(str(round(clock.get_fps(), 2)))
