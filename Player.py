@@ -71,6 +71,8 @@ class player:
         self.boost = 0
         self.life = 1
         self.score = 0
+        self.hp = hp
+        self.last_d = 0
 
     @property
     def pos(self):
@@ -151,8 +153,7 @@ class player:
                 ):
                     if direction in ["U", "D"]:
                         self.boost = 0
-                    self.life = 0
-                    self.x, self.y = player_pos
+                    self.die(time.time())
 
         for obj in objects[4]:
             for x, y in dots:
@@ -162,7 +163,7 @@ class player:
                 ):
                     self.score += 1
                     objects[4].remove(obj)
-                    print(self.score)
+                    print(self.score, '++++SCORE++++')
                     return speed
 
 
@@ -184,6 +185,30 @@ class player:
             )
         else:
             self.life = 1
+
+    def die(self, time):
+        global objects
+        self.x, self.y = player_pos
+        if time - self.last_d > 1:
+            self.life = 0
+            self.last_d = time
+            self.hp -= 1
+            if self.hp < 0:
+                objects[4] =     \
+                    [
+        Object(THECOLORS["yellow"], 715, 552, 20, 20),
+        Object(THECOLORS["yellow"], 65, 252, 20, 20),
+        Object(THECOLORS["yellow"], 700, 160, 20, 20),
+        Object(THECOLORS["yellow"], 740, 160, 20, 20),
+        Object(THECOLORS["yellow"], 400, 100, 20, 20),
+        Object(THECOLORS["yellow"], 260, 42, 20, 20),
+        Object(THECOLORS["yellow"], 240, 730, 20, 20),
+        Object(THECOLORS["yellow"], 280, 730, 20, 20),
+    ]
+                self.hp = 3
+                self.score = 0
+            print(self.hp, "====HP====")
+
 
     def movement(self):
         if self.life:
