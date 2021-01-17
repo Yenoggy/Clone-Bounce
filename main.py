@@ -7,8 +7,7 @@ from Cfg import *
 pygame.init()
 screen = pygame.display.set_mode((800, 800))
 clock = pygame.time.Clock()
-pygame.display.set_caption('Clone Bounce')
-pygame.display.set_icon(pygame.image.load("icon.bmp"))
+
 
 player = objs[0]
 
@@ -26,23 +25,18 @@ while True:
                 Server.Disconnect(player.nickname)
             exit()
 
-    screen.fill(THECOLORS['lightblue'])
+    screen.fill(THECOLORS["grey"])
 
     for obj in objs[1]:
         obj.draw(screen)
     for obj in objs[2]:
         objs[2][obj].draw(screen)
-    for obj in objs[3]:
-        obj.draw(screen)
-    for obj in objs[4]:
-        obj.draw(screen)
-    for obj in objs[5]:
-        obj.draw(screen)
     player.draw(screen)
     player.movement()
     for obj in objs[2]:
         objs[2][obj].movement()
 
     pygame.display.flip()
-    clock.tick(40)
+    clock.tick(60)
+    pygame.display.set_caption(str(round(clock.get_fps(), 2)))
 
