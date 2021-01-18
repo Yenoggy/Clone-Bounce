@@ -12,15 +12,15 @@ PlayerList = {}
 
 def Join():
     if len(PlayerList) == 0:
-        PlayerList['1'] = {'pos':StartPos, 'boost':0}
+        PlayerList['1'] = {'pos':StartPos, 'boost':0, 'nickname':'1', 'room':0}
     else:
-        PlayerList[str(int(list(PlayerList.keys())[-1])+1)] = {'pos':StartPos, 'boost':0}
+        PlayerList[str(int(list(PlayerList.keys())[-1])+1)] = {'pos':StartPos, 'boost':0, 'nickname':str(int(list(PlayerList.keys())[-1])+1), 'room':0}
     return str(list(PlayerList.keys())[-1])
 
 @app.post('/GetInfo')
-def GetInfo(x, y, nickname):
+def GetInfo(x, y, boost, room, nickname):
     if nickname in PlayerList:
-        PlayerList[nickname] = {'pos':(int(x),int(y)), 'boost':0}
+        PlayerList[nickname] = {'pos':(int(x),int(y)), 'boost':int(boost), 'nickname':nickname, 'room':int(room)}
         objects = PlayerList.copy()
         objects.pop(nickname)
         return objects
@@ -29,7 +29,7 @@ def GetInfo(x, y, nickname):
 @app.post('/Connect')
 def Connect():
     resp = Join()
-    return {'map':Map, "spikes":spikes, "coins":coins, "mud":mud, 'nickname':resp, 'pos':StartPos}
+    return {'map':Map, 'nickname':resp, 'pos':StartPos, 'room':0}
 
 @app.get('/Disconnect')
 def Disconnect(nickname):
@@ -37,14 +37,10 @@ def Disconnect(nickname):
     return ''
 
 def Start():
-    global Map, StartPos, spikes, coins, mud
+    global Map, StartPos
     with open('Config.json', 'r') as f:
         CFG = json.load(f)
-        Map = CFG['map']
-        spikes = CFG['spikes']
-        coins = CFG['coins']
-        mud = CFG['mud']
-
+        Map = CFG['MAP']
         StartPos = CFG['startpos']
 
 if __name__ == '__main__':

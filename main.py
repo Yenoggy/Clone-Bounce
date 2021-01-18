@@ -28,21 +28,17 @@ while True:
 
     screen.fill(THECOLORS['lightblue'])
     room = player.room
-    for obj in objs[1][room][0]:
-        obj.draw(screen)
+    for MAP in objs[1][room]:
+        for obj in MAP:
+            obj.draw(screen)
     for obj in objs[2]:
-        objs[2][obj].draw(screen)
-    for obj in objs[1][room][1]:
-        obj.draw(screen)
-    for obj in objs[1][room][2]:
-        obj.draw(screen)
-    for obj in objs[1][room][3]:
-        obj.draw(screen)
-    player.draw(screen)
+        if objs[2][obj].room == player.room:
+            objs[2][obj].draw(screen)
+    
     player.movement()
     for obj in objs[2]:
         objs[2][obj].movement()
-
+    player.draw(screen)
     pygame.display.flip()
     clock.tick(40)
 

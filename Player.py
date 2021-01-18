@@ -33,26 +33,23 @@ def ConnectServer():
     if resp.status_code == 200:
         global objects
         resp = loads(resp.text)
-        objects[0] = eval(resp['map'])
-        objects[1] = eval(resp['spikes'])
-        objects[2] = eval(resp['coins'])
-        objects[3] = eval(resp['mud'])
-
+        objects[1] = eval(resp['map'])
         objects[0].nickname = resp['nickname']
         objects[0].x, objects[0].y = resp['pos']
+        objects[0].room = resp['room']
         Tickrate = pygame.time.Clock()
         connected = 1
         while connected:
             # Thread(target=Server.GetInfo, args=((objects[0].x,objects[0].y),objects[0].nickname,)).start()
             # Info = Server.Info.get()
-            Info = Server.GetInfo((objects[0].x, objects[0].y), objects[0].nickname)
-            objects[2] = {}
+            Info = Server.GetInfo((objects[0].x, objects[0].y), objects[0].boost, objects[0].room, objects[0].nickname)
             for i in Info:
                 if i in objects[2]:
-                    objects[2][i].pos = Info[i]['pos']
+                    objects[2][i].x, objects[2][i].y = Info[i]['pos']
                     objects[2][i].boost = Info[i]['boost']
+                    objects[2][i].room = Info[i]['room']
                 else:
-                    objects[2][i] = ObjectPlayer(Info[i]['pos'])
+                    objects[2][i] = ObjectPlayer(Info[i]['pos'], Info[i]['nickname'])
             Tickrate.tick(30)
 
     else:
@@ -197,11 +194,13 @@ class player:
     def die(self, time):
         global objects
         self.x, self.y = player_pos
+        self.room = 0
         if time - self.last_d > 1:
             self.life = 0
+            
             self.last_d = time
             self.hp -= 1
-            self.room = 0
+            
             if self.hp < 0:
                 for i in Coins: 
                     objects[1][int(i)][2] = Coins[i].copy()
@@ -288,22 +287,34 @@ class Ring(pygame.sprite.Sprite):
 
 
 class ObjectPlayer:
-    def __init__(self, pos):
+    pygame.font.init()
+    Nickfont = pygame.font.Font(None, 12)
+    def __init__(self, pos, nick):
         self.x, self.y = pos
         self.radius = player_radius
+        self.nickname = nick
         self.boost = 0
         self.in_air = 0
+        self.room = 0
         self.rect = [
             self.x - self.radius,
             self.y - self.radius,
             self.x + self.radius,
             self.y + self.radius,
         ]
+        
+        self.text = self.Nickfont.render(
+            self.nickname, True, (0, 0, 0))
+        
+        
+        
 
     def draw(self, screen):
         pygame.draw.circle(
             screen, THECOLORS["blue"], (int(self.x), int(self.y)), self.radius
         )
+        place = self.text.get_rect(center=(self.x, self.y + 15))
+        screen.blit(self.text, place)
 
     def Collide(self, direction, speed):
 
@@ -337,7 +348,7 @@ class ObjectPlayer:
             (self.rect[0], self.rect[5]),
             (self.rect[2], self.rect[5]),
         ]
-        for obj in objects[1]:
+        for obj in objects[1][self.room][0]:
             for x, y in dots:
                 point = obj.rect
                 if (x > point[0] and x < point[2]) and (
@@ -389,6 +400,32 @@ class ObjectPlayer:
                     elif direction == 'D':
                         self.in_air = 0
                         return point[1] - (self.y + self.radius)
+        for obj in objects[1][self.room][1]:
+            for x, y in dots:
+                point = obj.rect
+                if (x > point[0] and x < point[2]) and (
+                        y > point[1] and y < point[3]
+                ):
+                    if direction in ["U", "D"]:
+                        self.boost = 0
+                    if direction == 'R':
+                        return point[0] - (self.x + self.radius)
+                    elif direction == 'L':
+                        return point[2] - (self.x - self.radius)
+                    elif direction == 'U':
+                        return point[3] - (self.y - self.radius)
+                    elif direction == 'D':
+                        self.in_air = 0
+                        return point[1] - (self.y + self.radius)
+
+        for obj in objects[1][self.room][3]:
+            for x, y in dots:
+                point = obj.rect
+                if (x > point[0] and x < point[2]) and (
+                        y > point[1] and y < point[3]
+                ):
+                    if direction in ["D"]:
+                        self.boost = 0
         return speed
         
     def movement(self):
