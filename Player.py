@@ -12,8 +12,7 @@ def upd():
     n=0
     for i in objects[1]:
         Coins[str(n)] = i[2].copy()
-        n += 1 
-    print(len(Coins["0"]))
+        n += 1
 
 
 
@@ -168,7 +167,6 @@ class player:
                     self.score += 1
                     objects[1][self.room][2].remove(obj)
                     print(self.score, '++++SCORE++++')
-                    print(len(Coins["0"]))
                     return speed
 
 
@@ -204,8 +202,6 @@ class player:
             if self.hp < 0:
                 for i in Coins: 
                     objects[1][int(i)][2] = Coins[i].copy()
-                    print(len(Coins["0"]))
-                    print(len(Coins["1"]))
                 self.hp = 3
                 self.score = 0
             print(self.hp, "====HP====")
