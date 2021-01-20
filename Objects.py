@@ -1,5 +1,6 @@
-from Player import player, Object, ObjectPlayer, upd, THECOLORS
+from Player import player, Object, ObjectPlayer, upd, THECOLORS, Coin
 from Cfg import *
+
 # from main import Update as ObjUpdate
 
 pl = player()

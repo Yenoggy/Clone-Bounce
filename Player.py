@@ -139,6 +139,7 @@ class player:
                     elif direction == 'D':
                         self.in_air = 0
                         return point[1] - (self.y + self.radius)
+
         for obj in objects[2]:
             if objects[2][obj].room == self.room:
                 for x, y in dots:
@@ -212,8 +213,6 @@ class player:
             if self.hp < 0:
                 for i in Coins: 
                     objects[1][int(i)][2] = Coins[i].copy()
-                    
-                    print(len(Coins["1"]))
                 self.hp = 3
                 self.score = 0
             print(self.hp, "====HP====")
