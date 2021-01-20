@@ -21,8 +21,8 @@ while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             if player.connected:
-                from Player import Server 
-                connected = 0
+                from Player import disc, Server
+                disc()
                 Server.Disconnect(player.nickname)
             exit()
 

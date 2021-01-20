@@ -12,12 +12,14 @@ def upd():
     n=0
     for i in objects[1]:
         Coins[str(n)] = i[2].copy()
-        n += 1
+        n += 1 
+    
 
-
+def disc():
+    player.connected = 0
 
 def ConnectServer():
-    global Server, connected
+    global Server
     os.system(
         'mshta "javascript:var sh=new ActiveXObject( \'WScript.Shell\' ); sh.Popup( \'Введи IP:PORT в консоли!\', 10, \'Подключение к серверу\', 64 );close()"')
     address = input('IP:PORT\n>>> ')
@@ -37,19 +39,25 @@ def ConnectServer():
         objects[0].x, objects[0].y = resp['pos']
         objects[0].room = resp['room']
         Tickrate = pygame.time.Clock()
-        connected = 1
-        while connected:
-            # Thread(target=Server.GetInfo, args=((objects[0].x,objects[0].y),objects[0].nickname,)).start()
-            # Info = Server.Info.get()
-            Info = Server.GetInfo((objects[0].x, objects[0].y), objects[0].boost, objects[0].room, objects[0].nickname)
-            for i in Info:
-                if i in objects[2]:
-                    objects[2][i].x, objects[2][i].y = Info[i]['pos']
-                    objects[2][i].boost = Info[i]['boost']
-                    objects[2][i].room = Info[i]['room']
-                else:
-                    objects[2][i] = ObjectPlayer(Info[i]['pos'], Info[i]['nickname'])
-            Tickrate.tick(30)
+        player.connected = 1
+        while player.connected:
+            try:
+                Info = Server.GetInfo((objects[0].x, objects[0].y), objects[0].boost, objects[0].room, objects[0].nickname)
+                players = objects[2].copy()
+                for i in players:
+                    if i not in Info:
+                        objects[2].pop(i)
+                for i in Info:
+                    if i in objects[2]:
+                        objects[2][i].x, objects[2][i].y = Info[i]['pos']
+                        objects[2][i].boost = Info[i]['boost']
+                        objects[2][i].room = Info[i]['room']
+                        objects[2][i].keys = Info[i]['keys']
+                    else:
+                        objects[2][i] = ObjectPlayer(Info[i]['pos'], Info[i]['nickname'])
+            except:
+                pass
+            Tickrate.tick(40)
 
     else:
         player.connected = 0
@@ -62,7 +70,8 @@ objects = []
 
 class player:
     connected = 0
-
+    pressed = [0,0,0,0,0,0]
+    oldpressed = [0,0,0,0,0,0]
     def __init__(self):
         self.nickname = ''
         self.radius = player_radius
@@ -131,22 +140,23 @@ class player:
                         self.in_air = 0
                         return point[1] - (self.y + self.radius)
         for obj in objects[2]:
-            for x, y in dots:
-                point = objects[2][obj].rect
-                if (x > point[0] and x < point[2]) and (
-                        y > point[1] and y < point[3]
-                ):
-                    if direction in ["U", "D"]:
-                        self.boost = 0
-                    if direction == 'R':
-                        return point[0] - (self.x + self.radius)
-                    elif direction == 'L':
-                        return point[2] - (self.x - self.radius)
-                    elif direction == 'U':
-                        return point[3] - (self.y - self.radius)
-                    elif direction == 'D':
-                        self.in_air = 0
-                        return point[1] - (self.y + self.radius)
+            if objects[2][obj].room == self.room:
+                for x, y in dots:
+                    point = objects[2][obj].rect
+                    if (x > point[0] and x < point[2]) and (
+                            y > point[1] and y < point[3]
+                    ):
+                        if direction in ["U", "D"]:
+                            self.boost = 0
+                        if direction == 'R':
+                            return point[0] - (self.x + self.radius)
+                        elif direction == 'L':
+                            return point[2] - (self.x - self.radius)
+                        elif direction == 'U':
+                            return point[3] - (self.y - self.radius)
+                        elif direction == 'D':
+                            self.in_air = 0
+                            return point[1] - (self.y + self.radius)
 
         for obj in objects[1][self.room][1]:
             for x, y in dots:
@@ -202,6 +212,8 @@ class player:
             if self.hp < 0:
                 for i in Coins: 
                     objects[1][int(i)][2] = Coins[i].copy()
+                    
+                    print(len(Coins["1"]))
                 self.hp = 3
                 self.score = 0
             print(self.hp, "====HP====")
@@ -210,6 +222,14 @@ class player:
     def movement(self):
         if self.life:
             key = pygame.key.get_pressed()
+            if player.connected:
+                player.pressed = [key[pygame.K_LEFT], key[pygame.K_a], key[pygame.K_UP], key[pygame.K_w], key[pygame.K_RIGHT], key[pygame.K_d]]
+                if player.pressed != player.oldpressed:
+                    player.oldpressed = player.pressed
+                    Server.SendKeys(player.pressed, self.nickname)
+                
+                
+            
             if key[pygame.K_F6]:
                 if not player.connected:
                     player.connected = 1
@@ -275,16 +295,29 @@ class Object:
         return self.x, self.y
 
 
-class Ring(pygame.sprite.Sprite):
-    def __init__(self, filename):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(filename)
-        self.rect = self.image.get_rect()
+class Coin:
+    def __init__(self, x1: int, y1: int):
+        self.x, self.y = (x1, y1)
+        self.radius = 8
+        self.rect = [
+            self.x - self.radius,
+            self.y - self.radius,
+            self.x + self.radius,
+            self.y + self.radius,
+        ]
 
+    def draw(self, screen):
+        pygame.draw.circle(
+            screen, THECOLORS["yellow"], (int(self.x), int(self.y)), self.radius
+        )
+
+    @property
+    def pos(self):
+        return self.x, self.y
 
 class ObjectPlayer:
     pygame.font.init()
-    Nickfont = pygame.font.Font(None, 12)
+    Nickfont = pygame.font.SysFont("Open Sans", 24)
     def __init__(self, pos, nick):
         self.x, self.y = pos
         self.radius = player_radius
@@ -292,24 +325,21 @@ class ObjectPlayer:
         self.boost = 0
         self.in_air = 0
         self.room = 0
+        self.keys = [0,0,0]
         self.rect = [
             self.x - self.radius,
             self.y - self.radius,
             self.x + self.radius,
             self.y + self.radius,
         ]
-        
         self.text = self.Nickfont.render(
             self.nickname, True, (0, 0, 0))
         
-        
-        
-
     def draw(self, screen):
         pygame.draw.circle(
             screen, THECOLORS["blue"], (int(self.x), int(self.y)), self.radius
         )
-        place = self.text.get_rect(center=(self.x, self.y + 15))
+        place = self.text.get_rect(center=(self.x, self.y + 18))
         screen.blit(self.text, place)
 
     def Collide(self, direction, speed):
@@ -425,6 +455,21 @@ class ObjectPlayer:
         return speed
         
     def movement(self):
+        if self.keys[0]:
+            self.speed = self.Collide("L", player_speed)
+            if self.speed:
+                self.x += self.speed
+                self.look = 0
+        if self.keys[2]:
+            self.speed = self.Collide("R", player_speed)
+            if self.speed:
+                self.x += self.speed
+                self.look = 1
+        if self.keys[1]:
+            if not self.in_air:
+                self.boost = jump_impulse
+                self.in_air = 1
+        
         if self.boost > 0:
             self.speed = self.Collide("U", self.boost)
             if self.speed:

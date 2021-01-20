@@ -12,19 +12,27 @@ PlayerList = {}
 
 def Join():
     if len(PlayerList) == 0:
-        PlayerList['1'] = {'pos':StartPos, 'boost':0, 'nickname':'1', 'room':0}
+        PlayerList['1'] = {'pos':StartPos, 'boost':0, 'nickname':'1', 'room':0, 'keys':[0,0,0]}
     else:
-        PlayerList[str(int(list(PlayerList.keys())[-1])+1)] = {'pos':StartPos, 'boost':0, 'nickname':str(int(list(PlayerList.keys())[-1])+1), 'room':0}
+        PlayerList[str(int(list(PlayerList.keys())[-1])+1)] = {'pos':StartPos, 'boost':0, 'nickname':str(int(list(PlayerList.keys())[-1])+1), 'room':0, 'keys':[0,0,0]}
     return str(list(PlayerList.keys())[-1])
 
 @app.post('/GetInfo')
 def GetInfo(x, y, boost, room, nickname):
     if nickname in PlayerList:
-        PlayerList[nickname] = {'pos':(int(x),int(y)), 'boost':int(boost), 'nickname':nickname, 'room':int(room)}
+        PlayerList[nickname]['pos']         =   (int(x),int(y))
+        PlayerList[nickname]['boost']       =   int(boost)
+        PlayerList[nickname]['nickname']    =   nickname
+        PlayerList[nickname]['room']        =   int(room)
         objects = PlayerList.copy()
         objects.pop(nickname)
         return objects
     return []
+
+@app.post('/SendKeys')
+def SendKeys(a, w, d, nickname):
+    if nickname in PlayerList:
+        PlayerList[nickname]['keys']        =   [int(a),int(w),int(d)]
 
 @app.post('/Connect')
 def Connect():

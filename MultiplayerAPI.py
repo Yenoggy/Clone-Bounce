@@ -23,5 +23,13 @@ class ServerAPI:
         # self.Info.put(loads(resp.text))
         return loads(resp.text)
 
-
-
+    def SendKeys(self, pressed, nickname):
+        keys = {'a':0,'w':0,'d':0}
+        if pressed[0] or pressed[1]:
+            keys['a'] = 1
+        if pressed[2] or pressed[3]:
+            keys['w'] = 1
+        if pressed[4] or pressed[5]:
+            keys['d'] = 1
+        keys['nickname'] = nickname
+        session.post(self.address+"/SendKeys", params=keys, timeout=25)
