@@ -9,4 +9,4 @@ player_look = 1
 
 jump_impulse = 20
 gravity = 1
-hp = 3
+hp = 2
