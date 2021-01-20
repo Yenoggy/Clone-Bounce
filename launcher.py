@@ -1,6 +1,8 @@
 from tkinter import *
+from tkinter.ttk import Combobox
 from win32api import GetSystemMetrics
-import webbrowser
+from threading import Thread
+import webbrowser, time
 
 
 ScreenX = GetSystemMetrics(0)
@@ -44,6 +46,13 @@ class Main:
         self.Startbtn_mp.place(x=86, y=200)
         self.color = '#FFFFFF'
 
+        self.IP = Entry(self.Startfr, width = 19, border=0, font=('Open Sans', 12))
+        self.IP.config(bg='#272727', fg='grey')
+        self.IP.insert(0, '37.143.12.148:12345')
+        self.IP.bind('<FocusIn>', self.on_Nickin)
+        self.IP.bind('<FocusOut>', self.on_Nickout)
+        self.IP.place(x=56,y=240)
+
         # Выход из лаунчера
         self.Exitlbl = Label(self.Startfr, text='Exit', font=('Arial', 12), cursor='hand2')
         self.Exitlbl.bind('<Button-1>', self.close)
@@ -65,15 +74,29 @@ class Main:
         self.cfg = open('cfg.py', 'a')
         self.cfg.write(self.color)
 
+    def on_Nickin(self, event):
+        if self.IP.get() == 'IP':
+            self.IP.delete(0, "end") # delete all the text in the entry
+            self.IP.insert(0, '') #Insert blank for user input
+            self.IP.config(fg = 'white')
+
+    def on_Nickout(self, event):
+        if self.IP.get() == '':
+            self.IP.insert(0, 'IP')
+            self.IP.config(fg = 'grey')
 
     # Запуск сингла
     def btnStartSingle(self):
-        import main
+        Thread(target=self.mainstart).start()
         self.window.destroy()
+
+    @staticmethod
+    def mainstart():
+        import main
 
     # Запуск мультиплеера
     def btnStart_mp(self):
-        import main
+        Thread(target=self.mainstart).start()
         self.window.destroy()
 
     # Закрытие окна
