@@ -1,5 +1,4 @@
 from tkinter import *
-from tkinter.ttk import Combobox
 from win32api import GetSystemMetrics
 import webbrowser
 
@@ -44,13 +43,6 @@ class Main:
         self.Startbtn_mp.bind("<Leave>", self.outStart_mp)
         self.Startbtn_mp.place(x=86, y=200)
         self.color = '#FFFFFF'
-
-        self.comboExample = Combobox(app,
-                                    values=[
-                                        "January",
-                                        "February",
-                                        "March",
-                                        "April"])
 
         # Выход из лаунчера
         self.Exitlbl = Label(self.Startfr, text='Exit', font=('Arial', 12), cursor='hand2')
