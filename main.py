@@ -18,6 +18,7 @@ def Update():
 
 while True:
 
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             if player.connected:
@@ -39,6 +40,19 @@ while True:
     for obj in objs[2]:
         objs[2][obj].movement()
     player.draw(screen)
+
+    pygame.font.init()
+    hpHud = pygame.font.SysFont("Open Sans", 24)
+    hpHudRender = hpHud.render(
+       'HP:' + str(player.hp), True, (0, 0, 0))
+    placeHp = hpHudRender.get_rect(left=10, bottom=794)
+    screen.blit(hpHudRender, placeHp)
+    coinHud = pygame.font.SysFont("Open Sans", 24)
+    coinHudRender = coinHud.render(
+        'Score: ' + str(player.score), True, (0, 0, 0))
+    placeCoin = coinHudRender.get_rect(right=790, bottom=794)
+    screen.blit(coinHudRender, placeCoin)
+
+
     pygame.display.flip()
     clock.tick(40)
-

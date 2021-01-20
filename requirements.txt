@@ -1,7 +1,6 @@
-pygame
-json
-fastapi
-uvicorn
-tkinter
-pywin32
-requests
+pygame==2.0.1
+fastapi==0.63.0
+uvicorn==0.13.3
+tkintertable==1.3.2
+pywin32==300
+requests==2.25.1
