@@ -73,6 +73,9 @@ objects = [
             Object(THECOLORS["mediumseagreen"], 550, 340, 120, 10),
             Object(THECOLORS["mediumseagreen"], 100, 70, 100, 10),
             Object(THECOLORS["mediumseagreen"], 70, 580, 130, 20),
+        ],
+        [
+
         ]],
         [
         [world,
@@ -135,7 +138,11 @@ objects = [
             Object(THECOLORS["mediumseagreen"], 350, 650, 280, 20),
             Object(THECOLORS["mediumseagreen"], 570, 240, 100, 20),
             Object(THECOLORS["mediumseagreen"], 340, 50, 190, 20),
+        ],
+        [
+            
         ]]],
+    {},
     {}
 ]
 upd()

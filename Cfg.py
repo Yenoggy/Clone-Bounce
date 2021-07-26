@@ -7,6 +7,6 @@ player_speed = 5
 player_look = 1
 
 
-jump_impulse = 20
+jump_impulse = 20 
 gravity = 1
 hp = 3

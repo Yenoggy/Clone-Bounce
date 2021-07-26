@@ -1,4 +1,5 @@
 import pygame, time, os
+from math import sqrt
 from Cfg import *
 from json import loads
 from pygame.color import THECOLORS
@@ -13,7 +14,12 @@ def upd():
     for i in objects[1]:
         Coins[str(n)] = i[2].copy()
         n += 1 
-    
+
+def Normalize(Vec):
+    Magnitude = sqrt(Vec.x**2 +Vec.y**2)
+    Vec.x = Vec.x/Magnitude
+    Vec.y = Vec.y/Magnitude
+    return Vec
 
 def disc():
     player.connected = 0
@@ -57,12 +63,13 @@ def ConnectServer():
                         objects[2][i] = ObjectPlayer(Info[i]['pos'], Info[i]['nickname'])
             except:
                 pass
-            Tickrate.tick(40)
+            Tickrate.tick(144)
 
     else:
         player.connected = 0
         os.system(
             f'mshta "javascript:var sh=new ActiveXObject( \'WScript.Shell\' ); sh.Popup( \'Соединение прервано! Код ошибки: {resp.status}\', 10, \'Ошибка при подключении\', 64 );close()"')
+
 
 
 objects = []
@@ -78,6 +85,7 @@ class player:
         self.x, self.y = player_pos
         self.rect = []
         self.look = player_look
+        self.last_shot = 0
         self.in_air = 0
         self.boost = 0
         self.life = 1
@@ -89,6 +97,15 @@ class player:
     @property
     def pos(self):
         return self.x, self.y
+
+    def Get_rect(self):
+        self.rect = [
+            self.x - self.radius,
+            self.y - self.radius,
+            self.x + self.radius,
+            self.y + self.radius,
+        ]
+        return self.rect
 
     def Collide(self, direction, speed):
 
@@ -143,7 +160,7 @@ class player:
         for obj in objects[2]:
             if objects[2][obj].room == self.room:
                 for x, y in dots:
-                    point = objects[2][obj].rect
+                    point = objects[2][obj].Get_rect()
                     if (x > point[0] and x < point[2]) and (
                             y > point[1] and y < point[3]
                     ):
@@ -217,7 +234,6 @@ class player:
                 self.score = 0
             print(self.hp, "====HP====")
 
-
     def movement(self):
         if self.life:
             key = pygame.key.get_pressed()
@@ -226,8 +242,20 @@ class player:
                 if player.pressed != player.oldpressed:
                     player.oldpressed = player.pressed
                     Server.SendKeys(player.pressed, self.nickname)
-                
-                
+
+            if pygame.mouse.get_pressed()[0]:
+                if time.time() - self.last_shot > 0.1 and self.pos !=pygame.mouse.get_pos():
+                    self.last_shot = time.time()
+                    vector = Normalize( pygame.math.Vector2(
+                            self.x - pygame.mouse.get_pos()[0],
+                            self.y - pygame.mouse.get_pos()[1] ))
+                    Id = int(list(objects[3].keys())[-1])+1 if len(objects[3]) > 0 else 1
+                    objects[3][str(Id)] = Bullet(
+                        Id,
+                        self.room,
+                        (self.x - vector.x*15, self.y - vector.y*15), 
+                        pygame.math.Vector2(vector.x*(-4), vector.y*(-4)) )
+
             
             if key[pygame.K_F6]:
                 if not player.connected:
@@ -341,6 +369,15 @@ class ObjectPlayer:
         place = self.text.get_rect(center=(self.x, self.y + 18))
         screen.blit(self.text, place)
 
+    def Get_rect(self):
+        self.rect = [
+            self.x - self.radius,
+            self.y - self.radius,
+            self.x + self.radius,
+            self.y + self.radius,
+        ]
+        return self.rect
+    
     def Collide(self, direction, speed):
 
         if direction in ["D", "U", "L"]:
@@ -392,7 +429,7 @@ class ObjectPlayer:
                         return point[1] - (self.y + self.radius)
         for obj in [objects[0],]:
             for x, y in dots:
-                point = obj.rect
+                point = obj.Get_rect()
                 if (x > point[0] and x < point[2]) and (
                         y > point[1] and y < point[3]
                 ):
@@ -410,7 +447,7 @@ class ObjectPlayer:
 
         for obj in objects[2]:
             for x, y in dots:
-                point = objects[2][obj].rect
+                point = objects[2][obj].Get_rect()
                 if (x > point[0] and x < point[2]) and (
                         y > point[1] and y < point[3]
                 ):
@@ -493,3 +530,109 @@ class ObjectPlayer:
             self.x = self.x // Width
         elif self.x < 0:
             self.x = Width
+
+class Bullet:
+    pygame.font.init()
+    Nickfont = pygame.font.SysFont("Open Sans", 24)
+    def __init__(self, Id, room, pos, vector):
+        self.x, self.y = pos
+        self.Id = Id
+        self.alive = True
+        self.vector = vector
+        self.radius = 2
+        self.room = room
+        self.rect = [
+            self.x - self.radius,
+            self.y - self.radius,
+            self.x + self.radius,
+            self.y + self.radius,
+        ]
+        
+    def draw(self, screen):
+        pygame.draw.circle(
+            screen, THECOLORS["blue"], (int(self.x), int(self.y)), self.radius
+        )
+    
+    def Get_rect(self):
+        self.rect = [
+            self.x - self.radius,
+            self.y - self.radius,
+            self.x + self.radius,
+            self.y + self.radius,
+        ]
+        return self.rect
+
+    def Collide(self, vector):
+        self.rect = [
+            self.x - self.radius + vector.x,
+            self.y - self.radius + vector.y,
+            self.x + self.radius + vector.x,
+            self.y + self.radius + vector.y,
+            self.x + vector.x,
+            self.y + vector.y,
+        ]
+        dots = [
+            (self.rect[0], self.rect[1]),
+            (self.rect[0], self.rect[3]),
+            (self.rect[2], self.rect[1]),
+            (self.rect[2], self.rect[3]),
+            (self.rect[4], self.rect[1]),
+            (self.rect[4], self.rect[3]),
+            (self.rect[0], self.rect[5]),
+            (self.rect[2], self.rect[5]),
+        ]
+        for obj in objects[1][self.room][0]:
+            for x, y in dots:
+                point = obj.rect
+                if (x > point[0] and x < point[2]) and (
+                        y > point[1] and y < point[3]
+                ):
+                    return False
+        for obj in [objects[0],]:
+            for x, y in dots:
+                point = obj.rect
+                if (x > point[0] and x < point[2]) and (
+                        y > point[1] and y < point[3]
+                ):
+                    obj.die(time.time())
+                    return False
+
+        for obj in objects[2]:
+            for x, y in dots:
+                point = objects[2][obj].rect
+                if (x > point[0] and x < point[2]) and (
+                        y > point[1] and y < point[3]
+                ):
+                    return False
+        for obj in objects[1][self.room][1]:
+            for x, y in dots:
+                point = obj.rect
+                if (x > point[0] and x < point[2]) and (
+                        y > point[1] and y < point[3]
+                ):
+                    return False
+        for obj in objects[1][self.room][3]:
+            for x, y in dots:
+                point = obj.rect
+                if (x > point[0] and x < point[2]) and (
+                        y > point[1] and y < point[3]
+                ):
+                    return False
+        return True
+        
+    def movement(self):
+        if self.Collide(self.vector) and self.alive:
+            self.x += self.vector.x
+            self.y += self.vector.y
+            if self.x > Width:
+                self.x = self.x // Width
+                self.room += 1
+            elif self.x < 0:
+                self.x = Width
+                self.room -= 1
+        else:
+            try:
+                self.alive = False
+                objects[3].pop(str(self.Id))
+            except:
+                pass
