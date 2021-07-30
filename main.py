@@ -1,3 +1,4 @@
+from Math import Normalize
 import pygame
 from pygame.threads import Thread
 from Objects import objects as objs
@@ -65,7 +66,11 @@ def Renderer():
 
 
         # Weapon vector Render
-        pygame.draw.aaline(screen, THECOLORS['black'], player.pos, pygame.mouse.get_pos())
+        vector = Normalize(pygame.math.Vector2(
+                            player.x - pygame.mouse.get_pos()[0],
+                            player.y - pygame.mouse.get_pos()[1] ))
+
+        pygame.draw.line(screen, THECOLORS['black'], (player.x - vector.x*10, player.y - vector.y*10), (player.x - vector.x*18, player.y - vector.y*18), 3)
         pygame.display.flip()
         Clock.tick(144)
 

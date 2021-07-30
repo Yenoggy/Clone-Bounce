@@ -1,10 +1,10 @@
 import pygame, time, os
-from math import sqrt
 from Cfg import *
 from json import loads
 from pygame.color import THECOLORS
 from MultiplayerAPI import ServerAPI
 from threading import Thread
+from Math import Normalize
 Coins = {}
 
 def upd():
@@ -14,12 +14,6 @@ def upd():
     for i in objects[1]:
         Coins[str(n)] = i[2].copy()
         n += 1 
-
-def Normalize(Vec):
-    Magnitude = sqrt(Vec.x**2 +Vec.y**2)
-    Vec.x = Vec.x/Magnitude
-    Vec.y = Vec.y/Magnitude
-    return Vec
 
 def disc():
     player.connected = 0
@@ -244,7 +238,7 @@ class player:
                     Server.SendKeys(player.pressed, self.nickname)
 
             if pygame.mouse.get_pressed()[0]:
-                if time.time() - self.last_shot > 0.1 and self.pos !=pygame.mouse.get_pos():
+                if time.time() - self.last_shot > 0.05 and self.pos !=pygame.mouse.get_pos():
                     self.last_shot = time.time()
                     vector = Normalize( pygame.math.Vector2(
                             self.x - pygame.mouse.get_pos()[0],
@@ -254,7 +248,7 @@ class player:
                         Id,
                         self.room,
                         (self.x - vector.x*15, self.y - vector.y*15), 
-                        pygame.math.Vector2(vector.x*(-4), vector.y*(-4)) )
+                        pygame.math.Vector2(vector.x*(-6), vector.y*(-6)) )
 
             
             if key[pygame.K_F6]:
@@ -446,22 +440,23 @@ class ObjectPlayer:
                         return point[1] - (self.y + self.radius)
 
         for obj in objects[2]:
-            for x, y in dots:
-                point = objects[2][obj].Get_rect()
-                if (x > point[0] and x < point[2]) and (
-                        y > point[1] and y < point[3]
-                ):
-                    if direction in ["U", "D"]:
-                        self.boost = 0
-                    if direction == 'R':
-                        return point[0] - (self.x + self.radius)
-                    elif direction == 'L':
-                        return point[2] - (self.x - self.radius)
-                    elif direction == 'U':
-                        return point[3] - (self.y - self.radius)
-                    elif direction == 'D':
-                        self.in_air = 0
-                        return point[1] - (self.y + self.radius)
+            if objects[2][obj] != self:
+                for x, y in dots:
+                    point = objects[2][obj].Get_rect()
+                    if (x > point[0] and x < point[2]) and (
+                            y > point[1] and y < point[3]
+                    ):
+                        if direction in ["U", "D"]:
+                            self.boost = 0
+                        if direction == 'R':
+                            return point[0] - (self.x + self.radius)
+                        elif direction == 'L':
+                            return point[2] - (self.x - self.radius)
+                        elif direction == 'U':
+                            return point[3] - (self.y - self.radius)
+                        elif direction == 'D':
+                            self.in_air = 0
+                            return point[1] - (self.y + self.radius)
         for obj in objects[1][self.room][1]:
             for x, y in dots:
                 point = obj.rect
@@ -630,6 +625,7 @@ class Bullet:
             elif self.x < 0:
                 self.x = Width
                 self.room -= 1
+            self.vector.y += gravity*3/144
         else:
             try:
                 self.alive = False
