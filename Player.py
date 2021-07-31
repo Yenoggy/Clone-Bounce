@@ -4,6 +4,7 @@ from json import loads
 from pygame.color import THECOLORS
 from MultiplayerAPI import ServerAPI
 from threading import Thread
+from random import random
 from Math import Normalize
 Coins = {}
 
@@ -248,7 +249,7 @@ class player:
                         Id,
                         self.room,
                         (self.x - vector.x*15, self.y - vector.y*15), 
-                        pygame.math.Vector2(vector.x*(-6), vector.y*(-6)) )
+                        pygame.math.Vector2(vector.x*(-6) + random()*0.3, vector.y*(-6) + random()*0.3))
 
             
             if key[pygame.K_F6]:
