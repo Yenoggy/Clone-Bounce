@@ -250,7 +250,7 @@ class player:
                     Server.SendKeys(player.pressed, self.nickname)
 
             if pygame.mouse.get_pressed()[0]:
-                if time.time() - self.last_shot > 0.03 and self.pos !=pygame.mouse.get_pos():
+                if time.time() - self.last_shot > 0.4 and self.pos !=pygame.mouse.get_pos():
                     self.last_shot = time.time()
                     vector = Normalize( pygame.math.Vector2(
                             self.x - pygame.mouse.get_pos()[0],
