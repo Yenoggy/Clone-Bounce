@@ -7,7 +7,7 @@ pl = player()
 
 objects = [
     pl,
-    [
+    """[
         [
         [   Object(THECOLORS["lightgoldenrod"], 0, Height // 2 + 370, Width, Height),
             Object(THECOLORS["slateblue3"], 0, 0, 800, 20),
@@ -140,8 +140,7 @@ objects = [
         ],
         [
             
-        ]]],
+        ]]]""",
     {},
     {}
 ]
-upd()

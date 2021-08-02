@@ -75,11 +75,11 @@ def Renderer():
         Clock.tick(144)
 
 def BulletMove():
-    Clock = pygame.time.Clock()
+    Cock = pygame.time.Clock()
     while True:
         for obj in objs[3].copy():
             objs[3][obj].movement()
-        Clock.tick(144)
+        Cock.tick(144)
 
 Thread(target=BulletMove).start()
 Thread(target=CreateMove).start()

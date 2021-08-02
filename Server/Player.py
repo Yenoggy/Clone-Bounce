@@ -2,15 +2,14 @@ import pygame, time, os
 from Cfg import *
 from json import loads
 from pygame.color import THECOLORS
-from MultiplayerAPI import ServerAPI
 from threading import Thread
 from random import random
-from Math import Normalize
 Coins = {}
 
 def upd():
     global objects, Coins
     from Objects import objects
+    objects[1] = eval(objects[1])
     n=0
     for i in objects[1]:
         Coins[str(n)] = i[2].copy()
@@ -44,29 +43,18 @@ def ConnectServer():
         while player.connected:
             try:
                 Info = Server.GetInfo((objects[0].x, objects[0].y), objects[0].boost, objects[0].room, objects[0].nickname)
-                for i in objects[2].copy():
-                    if i not in Info[0]:
+                players = objects[2].copy()
+                for i in players:
+                    if i not in Info:
                         objects[2].pop(i)
-                for i in Info[0]:
+                for i in Info:
                     if i in objects[2]:
-                        objects[2][i].x, objects[2][i].y = Info[0][i]['pos']
-                        objects[2][i].boost = Info[0][i]['boost']
-                        objects[2][i].room = Info[0][i]['room']
-                        objects[2][i].keys = Info[0][i]['keys']
+                        objects[2][i].x, objects[2][i].y = Info[i]['pos']
+                        objects[2][i].boost = Info[i]['boost']
+                        objects[2][i].room = Info[i]['room']
+                        objects[2][i].keys = Info[i]['keys']
                     else:
-                        objects[2][i] = ObjectPlayer(Info[0][i]['pos'], str(Info[0][i]['nickname']))
-                for i in objects[3].copy():
-                    if i not in Info[1]:
-                        objects[3].pop(i)
-                for i in Info[1]:
-                    if i in objects[3]:
-                        objects[3][i].x, objects[3][i].y = Info[1][i]['pos']
-                        objects[3][i].Id = Info[1][i]['Id']
-                        objects[3][i].vector = pygame.math.Vector2(*Info[1][i]['vector'])
-                        objects[3][i].room = Info[1][i]['room']
-                    else:
-                        objects[3][i] = Bullet(Info[1][i]['Id'], str(Info[1][i]['shooter']), Info[1][i]['room'], Info[1][i]['pos'], pygame.math.Vector2(Info[1][i]['vector']))
-                
+                        objects[2][i] = ObjectPlayer(Info[i]['pos'], Info[i]['nickname'])
             except:
                 pass
             Tickrate.tick(144)
@@ -99,6 +87,9 @@ class player:
         self.hp = hp
         self.last_d = 0
         self.room = 0
+
+    def __str__(self):
+        return "{'pos':"+str(list(self.pos))+", 'boost':"+str(self.boost)+", 'room': "+str(self.room)+", 'keys':"+str(self.keys)+", 'nickname':"+str(self.nickname)+"}"
 
     @property
     def pos(self):
@@ -250,7 +241,7 @@ class player:
                     Server.SendKeys(player.pressed, self.nickname)
 
             if pygame.mouse.get_pressed()[0]:
-                if time.time() - self.last_shot > 0.03 and self.pos !=pygame.mouse.get_pos():
+                if time.time() - self.last_shot > 0.05 and self.pos !=pygame.mouse.get_pos():
                     self.last_shot = time.time()
                     vector = Normalize( pygame.math.Vector2(
                             self.x - pygame.mouse.get_pos()[0],
@@ -316,7 +307,7 @@ class player:
             elif self.x < 0:
                 self.x = Width
                 self.room -= 1
-
+    
 
 class Object:
     def __init__(self, color, x1: int, y1: int, x2: int, y2: int):
@@ -374,7 +365,31 @@ class ObjectPlayer:
         ]
         self.text = self.Nickfont.render(
             self.nickname, True, (0, 0, 0))
-        
+    
+    def __str__(self):
+        return '{"pos":'+str(list(self.pos))+', "boost":'+str(self.boost)+', "room": '+str(self.room)+', "keys":'+str(self.keys)+', "nickname":'+str(self.nickname)+'}'
+
+    @property
+    def pos(self):
+        return self.x, self.y
+
+    def die(self, time):
+        global objects
+        self.x, self.y = player_pos
+        self.room = 0
+        if time - self.last_d > 1:
+            self.life = 0
+            
+            self.last_d = time
+            self.hp -= 1
+            
+            if self.hp < 0:
+                for i in Coins: 
+                    objects[1][int(i)][2] = Coins[i].copy()
+                self.hp = 3
+                self.score = 0
+
+
     def draw(self, screen):
         pygame.draw.circle(
             screen, THECOLORS["blue"], (int(self.x), int(self.y)), self.radius
@@ -440,24 +455,6 @@ class ObjectPlayer:
                     elif direction == 'D':
                         self.in_air = 0
                         return point[1] - (self.y + self.radius)
-        for obj in [objects[0],]:
-            for x, y in dots:
-                point = obj.Get_rect()
-                if (x > point[0] and x < point[2]) and (
-                        y > point[1] and y < point[3]
-                ):
-                    if direction in ["U", "D"]:
-                        self.boost = 0
-                    if direction == 'R':
-                        return point[0] - (self.x + self.radius)
-                    elif direction == 'L':
-                        return point[2] - (self.x - self.radius)
-                    elif direction == 'U':
-                        return point[3] - (self.y - self.radius)
-                    elif direction == 'D':
-                        self.in_air = 0
-                        return point[1] - (self.y + self.radius)
-
         for obj in objects[2]:
             if objects[2][obj] != self:
                 for x, y in dots:
@@ -562,12 +559,19 @@ class Bullet:
             self.x + self.radius,
             self.y + self.radius,
         ]
+    
+    def __str__(self):
+        return '{"Id":'+str(self.Id)+', "shooter":'+str(self.shooter)+', "room": '+str(self.room)+', "pos":'+str(list(self.pos))+', "vector":'+str(self.vector)+'}'
         
     def draw(self, screen):
         pygame.draw.circle(
             screen, THECOLORS["blue"], (int(self.x), int(self.y)), self.radius
         )
     
+    @property
+    def pos(self):
+        return self.x, self.y
+
     def Get_rect(self):
         self.rect = [
             self.x - self.radius,
@@ -603,15 +607,6 @@ class Bullet:
                         y > point[1] and y < point[3]
                 ):
                     return False
-        for obj in [objects[0],]:
-            for x, y in dots:
-                point = obj.rect
-                if (x > point[0] and x < point[2]) and (
-                        y > point[1] and y < point[3]
-                ):
-                    if self.shooter != obj.nickname:
-                        obj.die(time.time())
-                        return False
 
         for obj in objects[2]:
             for x, y in dots:
@@ -619,15 +614,11 @@ class Bullet:
                 if (x > point[0] and x < point[2]) and (
                         y > point[1] and y < point[3]
                 ):
-                    return False
+                    if self.shooter != objects[2][obj].nickname:
+                        # objects[2][obj].die(time.time())
+                        print('dead')
+                        return False
         for obj in objects[1][self.room][1]:
-            for x, y in dots:
-                point = obj.rect
-                if (x > point[0] and x < point[2]) and (
-                        y > point[1] and y < point[3]
-                ):
-                    return False
-        for obj in objects[1][self.room][3]:
             for x, y in dots:
                 point = obj.rect
                 if (x > point[0] and x < point[2]) and (
