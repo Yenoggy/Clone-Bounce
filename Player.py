@@ -556,6 +556,7 @@ class Bullet:
         self.vector = vector
         self.radius = 2
         self.room = room
+        self.tail_points = []
         self.rect = [
             self.x - self.radius,
             self.y - self.radius,
@@ -563,10 +564,22 @@ class Bullet:
             self.y + self.radius,
         ]
         
+    @property
+    def pos(self):
+        return self.x, self.y
+    
     def draw(self, screen):
-        pygame.draw.circle(
-            screen, THECOLORS["blue"], (int(self.x), int(self.y)), self.radius
-        )
+        if self.alive:
+            pygame.draw.circle(
+                screen, THECOLORS["firebrick1"], (int(self.x), int(self.y)), self.radius
+            )
+        if len(self.tail_points)>1:
+            pygame.draw.lines(screen, THECOLORS['mediumpurple1'], False, self.tail_points, 3)
+
+
+
+            
+
     
     def Get_rect(self):
         self.rect = [
@@ -603,15 +616,7 @@ class Bullet:
                         y > point[1] and y < point[3]
                 ):
                     return False
-        for obj in [objects[0],]:
-            for x, y in dots:
-                point = obj.rect
-                if (x > point[0] and x < point[2]) and (
-                        y > point[1] and y < point[3]
-                ):
-                    if self.shooter != obj.nickname:
-                        obj.die(time.time())
-                        return False
+
 
         for obj in objects[2]:
             for x, y in dots:
@@ -621,13 +626,6 @@ class Bullet:
                 ):
                     return False
         for obj in objects[1][self.room][1]:
-            for x, y in dots:
-                point = obj.rect
-                if (x > point[0] and x < point[2]) and (
-                        y > point[1] and y < point[3]
-                ):
-                    return False
-        for obj in objects[1][self.room][3]:
             for x, y in dots:
                 point = obj.rect
                 if (x > point[0] and x < point[2]) and (
@@ -646,10 +644,18 @@ class Bullet:
             elif self.x < 0:
                 self.x = Width
                 self.room -= 1
-            self.vector.y += gravity*3/144
+            self.vector.y += gravity*4.5/144
+            self.tail_points.append(self.pos)
+            if len(self.tail_points) > 70:
+                self.tail_points.remove(self.tail_points[0])
         else:
             try:
+                if self.alive:
+                    self.tail_points.append((self.x + self.vector.x, self.y + self.vector.y))
                 self.alive = False
-                objects[3].pop(str(self.Id))
+                if len(self.tail_points) > 1:
+                    self.tail_points.remove(self.tail_points[0])
+                else:
+                    objects[3].pop(str(self.Id))
             except:
                 pass
