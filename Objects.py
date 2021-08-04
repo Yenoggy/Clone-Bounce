@@ -4,17 +4,15 @@ from Cfg import *
 # from main import Update as ObjUpdate
 
 pl = player()
-world = Object(THECOLORS["lightgoldenrod"], 0, Height // 2 + 370, Width, Height)
 
 objects = [
     pl,
     [
         [
-        [world,
-            Object(THECOLORS["slateblue3"], 0, 0, 700, 20),
-            Object(THECOLORS["slateblue3"], 780, 0, 20, 90),
+        [   Object(THECOLORS["lightgoldenrod"], 0, Height // 2 + 370, Width, Height),
+            Object(THECOLORS["slateblue3"], 0, 0, 800, 20),
             Object(THECOLORS["slateblue3"], 0, 0, 20, 770),
-            Object(THECOLORS["slateblue3"], 780, 210, 20, 390),
+            Object(THECOLORS["slateblue3"], 780, 0, 20, 600),
             Object(THECOLORS["slateblue3"], 0, 200, 150, 20),
             Object(THECOLORS["slateblue3"], 0, 300, 200, 20),
             Object(THECOLORS["slateblue3"], 650, 500, 150, 20),
@@ -34,9 +32,8 @@ objects = [
             Object(THECOLORS["slateblue3"], 90, 80, 220, 20),
             Object(THECOLORS["slateblue3"], 105, 100, 20, 25),
             Object(THECOLORS["slateblue3"], 105, 175, 20, 25),
-            Object(THECOLORS["slateblue3"], 550, 0, 20, 210),
-            Object(THECOLORS["slateblue3"], 700, 90, 100, 20),
-
+            Object(THECOLORS["slateblue3"], 550, 0, 20, 80),
+            Object(THECOLORS["slateblue3"], 550, 140, 20, 60),
         ],
         [
             Object(THECOLORS["hotpink3"], 250, 560, 20, 40),
@@ -80,10 +77,9 @@ objects = [
 
         ]],
         [
-        [world,
+        [   Object(THECOLORS["lightgoldenrod"], 0, Height // 2 + 370, Width, Height),
             Object(THECOLORS["slateblue3"], 0, 0, 800, 20),
-            Object(THECOLORS["slateblue3"], 0, 0, 20, 100),
-            Object(THECOLORS["slateblue3"], 0, 210, 20, 400),
+            Object(THECOLORS["slateblue3"], 0, 0, 20, 600),
             Object(THECOLORS["slateblue3"], 780, 0, 20, 770),
             Object(THECOLORS["slateblue3"], 0, 600, 140, 20),
             Object(THECOLORS["slateblue3"], 200, 470, 20, 300),
@@ -101,8 +97,8 @@ objects = [
             Object(THECOLORS["slateblue3"], 230, 160, 110, 20),
             Object(THECOLORS["slateblue3"], 670, 30, 130, 20),
             Object(THECOLORS["slateblue3"], 700, 130, 100, 20),
-            Object(THECOLORS["slateblue3"], 0, 90, 100, 20),
-            Object(THECOLORS["slateblue3"], 0, 200, 130, 20),
+            Object(THECOLORS["slateblue3"], 0, 80, 100, 20),
+            Object(THECOLORS["slateblue3"], 0, 180, 130, 20),
             Object(THECOLORS["slateblue3"], 320, 160, 20, 110),
         ],
         [
@@ -119,9 +115,10 @@ objects = [
             Object(THECOLORS["hotpink3"], 540, 595, 20, 35),
             Object(THECOLORS["hotpink3"], 580, 595, 20, 35),
             Object(THECOLORS["hotpink3"], 620, 595, 20, 35),
+            Object(THECOLORS["hotpink3"], 20, 115, 40, 20),
+            Object(THECOLORS["hotpink3"], 20, 150, 40, 20),
             Object(THECOLORS["hotpink3"], 740, 65, 40, 20),
             Object(THECOLORS["hotpink3"], 740, 100, 40, 20),
-            Object(THECOLORS["hotpink3"], 130, 200, 60, 20),
 
         ],
         [
@@ -130,8 +127,9 @@ objects = [
             Object(THECOLORS["yellow"], 580, 730, 20, 20),
             Object(THECOLORS["yellow"], 750, 370, 20, 20),
             Object(THECOLORS["yellow"], 750, 430, 20, 20),
-            Object(THECOLORS["yellow"], 715, 83, 20, 20),
-            Object(THECOLORS["yellow"], 40, 45, 20, 20),
+            Object(THECOLORS["yellow"], 65, 132, 20, 20),
+            Object(THECOLORS["yellow"], 715, 82, 20, 20),
+            Object(THECOLORS["yellow"], 40, 40, 20, 20),
         ],
         [
             Object(THECOLORS["mediumseagreen"], 80, 490, 80, 20),

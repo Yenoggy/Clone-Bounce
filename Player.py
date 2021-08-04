@@ -91,6 +91,7 @@ class player:
         self.x, self.y = player_pos
         self.rect = []
         self.look = player_look
+        self.tail_points = []
         self.last_shot = 0
         self.in_air = 0
         self.boost = 0
@@ -217,6 +218,18 @@ class player:
 
     def draw(self, screen):
         if self.life:
+            if len(self.tail_points) > 1:
+                n=0
+                tail = self.tail_points.copy()
+                tail.reverse()
+                for i in tail:
+                    if i != self.pos:
+                        n+=1
+                        circle = pygame.Surface((self.radius*2, self.radius*2), pygame.SRCALPHA)
+                        pygame.draw.circle(
+                            circle, (0, 128, 255, 100-14*n), (self.radius, self.radius), self.radius
+                        )
+                        screen.blit(circle, (int(i[0]-self.radius), int(i[1]-self.radius)))
             pygame.draw.circle(
                 screen, THECOLORS["brown"], (int(self.x), int(self.y)), self.radius
             )
@@ -250,7 +263,7 @@ class player:
                     Server.SendKeys(player.pressed, self.nickname)
 
             if pygame.mouse.get_pressed()[0]:
-                if time.time() - self.last_shot > 0.4 and self.pos !=pygame.mouse.get_pos():
+                if time.time() - self.last_shot > 0.02 and self.pos !=pygame.mouse.get_pos():
                     self.last_shot = time.time()
                     vector = Normalize( pygame.math.Vector2(
                             self.x - pygame.mouse.get_pos()[0],
@@ -309,6 +322,10 @@ class player:
                     self.boost -= gravity
                 else:
                     self.boost -= gravity
+            
+            self.tail_points.append(self.pos)
+            if len(self.tail_points) > 5:
+                self.tail_points.remove(self.tail_points[0])
 
             if self.x > Width:
                 self.x = self.x // Width
@@ -362,6 +379,7 @@ class ObjectPlayer:
         self.x, self.y = pos
         self.radius = player_radius
         self.nickname = nick
+        self.tail_points = []
         self.boost = 0
         self.in_air = 0
         self.room = 0
@@ -374,8 +392,24 @@ class ObjectPlayer:
         ]
         self.text = self.Nickfont.render(
             self.nickname, True, (0, 0, 0))
+    
+    @property
+    def pos(self):
+        return self.x, self.y
         
     def draw(self, screen):
+        if len(self.tail_points) > 1:
+                n=0
+                tail = self.tail_points.copy()
+                tail.reverse()
+                for i in tail:
+                    if i != self.pos:
+                        n+=1
+                        circle = pygame.Surface((self.radius*2, self.radius*2), pygame.SRCALPHA)
+                        pygame.draw.circle(
+                            circle, (0, 128, 255, 100-14*n), (self.radius, self.radius), self.radius
+                        )
+                        screen.blit(circle, (int(i[0]-self.radius), int(i[1]-self.radius)))
         pygame.draw.circle(
             screen, THECOLORS["blue"], (int(self.x), int(self.y)), self.radius
         )
@@ -539,6 +573,10 @@ class ObjectPlayer:
                 self.boost -= gravity
             else:
                 self.boost -= gravity
+        
+        self.tail_points.append(self.pos)
+        if len(self.tail_points) > 5:
+            self.tail_points.remove(self.tail_points[0])
 
         if self.x > Width:
             self.x = self.x // Width
@@ -573,13 +611,18 @@ class Bullet:
             pygame.draw.circle(
                 screen, THECOLORS["firebrick1"], (int(self.x), int(self.y)), self.radius
             )
-        if len(self.tail_points)>1:
-            pygame.draw.lines(screen, THECOLORS['mediumpurple1'], False, self.tail_points, 3)
-
-
-
-            
-
+        if len(self.tail_points) > 1:
+                n=0
+                tail = self.tail_points.copy()
+                tail.reverse()
+                for i in tail:
+                    if i != self.pos:
+                        n+=1
+                        circle = pygame.Surface((self.radius*2, self.radius*2), pygame.SRCALPHA)
+                        pygame.draw.circle(
+                            circle, (255-n*(255/16), 0+n*(255/16), 0, 100-8*n), (self.radius, self.radius), self.radius
+                        )
+                        screen.blit(circle, (int(i[0]-self.radius), int(i[1]-self.radius)))
     
     def Get_rect(self):
         self.rect = [
@@ -646,7 +689,7 @@ class Bullet:
                 self.room -= 1
             self.vector.y += gravity*4.5/144
             self.tail_points.append(self.pos)
-            if len(self.tail_points) > 70:
+            if len(self.tail_points) > 12:
                 self.tail_points.remove(self.tail_points[0])
         else:
             try:

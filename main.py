@@ -4,6 +4,7 @@ from pygame.threads import Thread
 from Objects import objects as objs
 from Objects import THECOLORS
 from MultiplayerAPI import ServerAPI
+from numba import jit, cuda
 from Cfg import *
 
 pygame.init()
@@ -17,6 +18,7 @@ def Update():
     global objs
     from Objects import objects as objs
 
+
 def CreateMove():
     tickrate = pygame.time.Clock()
     while True:
@@ -26,21 +28,23 @@ def CreateMove():
             objs[2][obj].movement()
         tickrate.tick(40)
 
+ 
 def Renderer():
+    global screen
     Clock = pygame.time.Clock()
     while True:
         # World Render
         screen.fill(THECOLORS['lightblue'])
         room = player.room
-        for MAP in objs[1][room]:
-            for obj in MAP:
-                obj.draw(screen)
-        for obj in objs[2]:
-            if objs[2][obj].room == room:
-                objs[2][obj].draw(screen)
-        for obj in objs[3]:
+        for obj in objs[3].copy():
             if objs[3][obj].room == room:
                 objs[3][obj].draw(screen)
+        for MAP in objs[1][room]:
+            for obj in MAP.copy():
+                obj.draw(screen)
+        for obj in objs[2].copy():
+            if objs[2][obj].room == room:
+                objs[2][obj].draw(screen)
         
         player.draw(screen)
 
@@ -73,6 +77,7 @@ def Renderer():
         pygame.draw.line(screen, THECOLORS['black'], (player.x - vector.x*10, player.y - vector.y*10), (player.x - vector.x*18, player.y - vector.y*18), 3)
         pygame.display.flip()
         Clock.tick(144)
+
 
 def BulletMove():
     Cock = pygame.time.Clock()
