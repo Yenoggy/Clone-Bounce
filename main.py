@@ -5,6 +5,7 @@ from Objects import objects as objs
 from Objects import THECOLORS
 from MultiplayerAPI import ServerAPI
 from numba import jit, cuda
+from time import time
 from Cfg import *
 
 pygame.init()
@@ -26,6 +27,9 @@ def CreateMove():
         player.movement()
         for obj in objs[2].copy():
             objs[2][obj].movement()
+        for booster in player.booster.copy():
+            if int(time()) - player.booster[booster]['time'] > 5:
+                player.booster.pop(booster)
         tickrate.tick(40)
 
  
@@ -45,6 +49,10 @@ def Renderer():
         for obj in objs[2].copy():
             if objs[2][obj].room == room:
                 objs[2][obj].draw(screen)
+        for Room in objs[1].copy():
+            for obj in Room[4]:
+                if not obj.alive:
+                    obj.Use()
         
         player.draw(screen)
 

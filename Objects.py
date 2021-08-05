@@ -74,7 +74,7 @@ objects = [
             Object(THECOLORS["mediumseagreen"], 70, 580, 130, 20),
         ],
         [
-
+            Object(THECOLORS["tomato"], 500, 400, 20, 20, 1)
         ]],
         [
         [   Object(THECOLORS["lightgoldenrod"], 0, Height // 2 + 370, Width, Height),
@@ -139,7 +139,7 @@ objects = [
             Object(THECOLORS["mediumseagreen"], 340, 50, 190, 20),
         ],
         [
-            
+            Object(THECOLORS["tomato"], 500, 400, 20, 20, 1),
         ]]],
     {},
     {}

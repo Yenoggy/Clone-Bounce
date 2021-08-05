@@ -4,7 +4,7 @@ from json import loads
 from pygame.color import THECOLORS
 from MultiplayerAPI import ServerAPI
 from threading import Thread
-from random import random
+from random import random, randint
 from Math import Normalize
 Coins = {}
 
@@ -92,6 +92,7 @@ class player:
         self.rect = []
         self.look = player_look
         self.tail_points = []
+        self.booster = {}
         self.last_shot = 0
         self.in_air = 0
         self.boost = 0
@@ -146,7 +147,7 @@ class player:
             (self.rect[0], self.rect[5]),
             (self.rect[2], self.rect[5]),
         ]
-        for obj in objects[1][self.room][0]:
+        for obj in objects[1][self.room][0].copy():
             for x, y in dots:
                 point = obj.rect
                 if (x > point[0] and x < point[2]) and (
@@ -164,7 +165,7 @@ class player:
                         self.in_air = 0
                         return point[1] - (self.y + self.radius)
 
-        for obj in objects[2]:
+        for obj in objects[2].copy():
             if objects[2][obj].room == self.room:
                 for x, y in dots:
                     point = objects[2][obj].Get_rect()
@@ -183,7 +184,7 @@ class player:
                             self.in_air = 0
                             return point[1] - (self.y + self.radius)
 
-        for obj in objects[1][self.room][1]:
+        for obj in objects[1][self.room][1].copy():
             for x, y in dots:
                 point = obj.rect
                 if (x > point[0] and x < point[2]) and (
@@ -192,8 +193,9 @@ class player:
                     if direction in ["U", "D"]:
                         self.boost = 0
                     self.die(time.time())
+                    break
 
-        for obj in objects[1][self.room][2]:
+        for obj in objects[1][self.room][2].copy():
             for x, y in dots:
                 point = obj.rect
                 if (x > point[0] and x < point[2]) and (
@@ -202,10 +204,9 @@ class player:
                     self.score += 1
                     objects[1][self.room][2].remove(obj)
                     print(self.score, '++++SCORE++++')
-                    return speed
+                    break
 
-
-        for obj in objects[1][self.room][3]:
+        for obj in objects[1][self.room][3].copy():
             for x, y in dots:
                 point = obj.rect
                 if (x > point[0] and x < point[2]) and (
@@ -213,6 +214,20 @@ class player:
                 ):
                     if direction in ["D"]:
                         self.boost = 0
+                    break
+        
+        for obj in objects[1][self.room][4].copy():
+            if obj.alive:
+                for x, y in dots:
+                    point = obj.rect
+                    if (x > point[0] and x < point[2]) and (
+                            y > point[1] and y < point[3]
+                    ):
+                        Id = randint(1,3)
+                        self.booster[str(Id)] = {'time':int(time.time()), 'Id':Id}
+                        print(Id)
+                        obj.Use()
+                        break
 
         return speed
 
@@ -263,7 +278,10 @@ class player:
                     Server.SendKeys(player.pressed, self.nickname)
 
             if pygame.mouse.get_pressed()[0]:
-                if time.time() - self.last_shot > 0.02 and self.pos !=pygame.mouse.get_pos():
+                n=1
+                if '1' in self.booster:
+                    n = 5
+                if time.time() - self.last_shot > 0.4/n and self.pos !=pygame.mouse.get_pos():
                     self.last_shot = time.time()
                     vector = Normalize( pygame.math.Vector2(
                             self.x - pygame.mouse.get_pos()[0],
@@ -289,12 +307,18 @@ class player:
                     Thread(target=ConnectServer).start()
 
             if key[pygame.K_LEFT] or key[pygame.K_a]:
-                self.speed = self.Collide("L", player_speed)
+                n = 1
+                if '2' in self.booster:
+                    n = 2 
+                self.speed = self.Collide("L", player_speed*n)
                 if self.speed:
                     self.x += self.speed
                     self.look = 0
             if key[pygame.K_RIGHT] or key[pygame.K_d]:
-                self.speed = self.Collide("R", player_speed)
+                n=1
+                if '2' in self.booster:
+                    n = 2
+                self.speed = self.Collide("R", player_speed*n)
                 if self.speed:
                     self.x += self.speed
                     self.look = 1
@@ -336,16 +360,31 @@ class player:
 
 
 class Object:
-    def __init__(self, color, x1: int, y1: int, x2: int, y2: int):
+    def __init__(self, color, x1: int, y1: int, x2: int, y2: int, booster=False):
         self.x, self.y = (x1, y1)
+        self.alive = 1
+        self.death_time = 0
         self.offsets = (x2, y2)
         self.color = color
+        self.booster = booster
+        self.Last_use = 0
         self.rect = [self.x, self.y, self.x + self.offsets[0], self.y + self.offsets[1]]
 
+    def Use(self):
+        if self.alive:
+            self.alive = 0
+            self.death_time = int(time.time())
+        elif int(time.time()) - self.death_time > 5:
+                self.alive = 1
+
+
     def draw(self, screen):
-        pygame.draw.rect(
-            screen, self.color, (self.x, self.y, self.offsets[0], self.offsets[1])
-        )
+        if self.alive:
+            pygame.draw.rect(
+                screen, self.color, (self.x, self.y, self.offsets[0], self.offsets[1])
+            )
+
+
 
     @property
     def pos(self):
