@@ -281,7 +281,7 @@ class player:
                 n=1
                 if '1' in self.booster:
                     n = 5
-                if time.time() - self.last_shot > 0.04/n and self.pos !=pygame.mouse.get_pos():
+                if time.time() - self.last_shot > 0.4/n and self.pos !=pygame.mouse.get_pos():
                     self.last_shot = time.time()
                     vector = Normalize( pygame.math.Vector2(
                             self.x - pygame.mouse.get_pos()[0],
@@ -754,7 +754,7 @@ class Bullet:
             self.tail_points.append(self.pos)
             if len(self.tail_points) > 12:
                 self.tail_points.remove(self.tail_points[0])
-        elif not self.ricochet or self.hits > 10:
+        elif not self.ricochet or self.hits > 3:
             try:
                 if self.alive:
                     self.tail_points.append((self.x + self.vector.x, self.y + self.vector.y))
