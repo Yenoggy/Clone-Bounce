@@ -281,7 +281,7 @@ class player:
                 n=1
                 if '1' in self.booster:
                     n = 5
-                if time.time() - self.last_shot > 0.4/n and self.pos !=pygame.mouse.get_pos():
+                if time.time() - self.last_shot > 0.04/n and self.pos !=pygame.mouse.get_pos():
                     self.last_shot = time.time()
                     vector = Normalize( pygame.math.Vector2(
                             self.x - pygame.mouse.get_pos()[0],
@@ -293,13 +293,15 @@ class player:
                             self.nickname,
                             self.room,
                             (self.x - vector.x*15, self.y - vector.y*15), 
-                            pygame.math.Vector2(vector.x*(-6) + random()*0.3, vector.y*(-6) + random()*0.3))
+                            pygame.math.Vector2(vector.x*(-6) + random()*0.3, vector.y*(-6) + random()*0.3),
+                            '3' in self.booster)
                     else:
                         Server.CreateShot(
                             self.nickname,
                             self.room,
                             (self.x - vector.x*15, self.y - vector.y*15), 
-                            pygame.math.Vector2(vector.x*(-6) + random()*0.3, vector.y*(-6) + random()*0.3))
+                            pygame.math.Vector2(vector.x*(-6) + random()*0.3, vector.y*(-6) + random()*0.3),
+                            '3' in self.booster)
             
             if key[pygame.K_F6]:
                 if not player.connected:
@@ -625,11 +627,13 @@ class ObjectPlayer:
 class Bullet:
     pygame.font.init()
     Nickfont = pygame.font.SysFont("Open Sans", 24)
-    def __init__(self, Id, shooter, room, pos, vector):
+    def __init__(self, Id, shooter, room, pos, vector, ricochet=0):
         self.x, self.y = pos
         self.shooter = shooter
         self.Id = Id
         self.alive = True
+        self.hits = 0
+        self.ricochet = ricochet
         self.vector = vector
         self.radius = 2
         self.room = room
@@ -694,11 +698,20 @@ class Bullet:
         for obj in objects[1][self.room][0]:
             for x, y in dots:
                 point = obj.rect
-                if (x > point[0] and x < point[2]) and (
-                        y > point[1] and y < point[3]
-                ):
+                if  (x > point[0] and x < point[2])\
+                and (y > point[1] and y < point[3]):
+                    if self.ricochet:
+                        self.hits +=1
+                        if  (self.rect[0] > point[0] and self.rect[0] < point[2]) and (self.y > point[1] and self.y < point[3]) or\
+                            (self.rect[2] > point[0] and self.rect[2] < point[2]) and (self.y > point[1] and self.y < point[3]) or\
+                            (self.rect[4] > point[0] and self.rect[4] < point[2]) and (self.y > point[1] and self.y < point[3]):
+                            vector.x *= -1
+                        if  (self.rect[1] > point[1] and self.rect[1] < point[3]) and (self.x > point[0] and self.x < point[2]) or\
+                            (self.rect[3] > point[1] and self.rect[3] < point[3]) and (self.x > point[0] and self.x < point[2]) or\
+                            (self.rect[5] > point[1] and self.rect[5] < point[3]) and (self.x > point[0] and self.x < point[2]):
+                            vector.y *= -1
+                            vector.y *= 0.9
                     return False
-
 
         for obj in objects[2]:
             for x, y in dots:
@@ -706,6 +719,7 @@ class Bullet:
                 if (x > point[0] and x < point[2]) and (
                         y > point[1] and y < point[3]
                 ):
+                    self.hits = 100
                     return False
         for obj in objects[1][self.room][1]:
             for x, y in dots:
@@ -713,6 +727,16 @@ class Bullet:
                 if (x > point[0] and x < point[2]) and (
                         y > point[1] and y < point[3]
                 ):
+                    if self.ricochet:
+                        self.hits +=1
+                        if  (self.rect[0] > point[0] and self.rect[0] < point[2]) and (self.y > point[1] and self.y < point[3]) or\
+                            (self.rect[2] > point[0] and self.rect[2] < point[2]) and (self.y > point[1] and self.y < point[3]) or\
+                            (self.rect[4] > point[0] and self.rect[4] < point[2]) and (self.y > point[1] and self.y < point[3]):
+                            vector.x *= -1
+                        if  (self.rect[1] > point[1] and self.rect[1] < point[3]) and (self.x > point[0] and self.x < point[2]) or\
+                            (self.rect[3] > point[1] and self.rect[3] < point[3]) and (self.x > point[0] and self.x < point[2]) or\
+                            (self.rect[5] > point[1] and self.rect[5] < point[3]) and (self.x > point[0] and self.x < point[2]):
+                            vector.y *= -1
                     return False
         return True
         
@@ -730,7 +754,7 @@ class Bullet:
             self.tail_points.append(self.pos)
             if len(self.tail_points) > 12:
                 self.tail_points.remove(self.tail_points[0])
-        else:
+        elif not self.ricochet or self.hits > 10:
             try:
                 if self.alive:
                     self.tail_points.append((self.x + self.vector.x, self.y + self.vector.y))
